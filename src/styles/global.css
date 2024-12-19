@@ -1,0 +1,19 @@
+@import "./variables.css";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: var(--font-color);
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color) !important;
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: var(--font-color);
+}

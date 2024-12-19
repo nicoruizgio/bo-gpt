@@ -1,0 +1,30 @@
+.chat-item {
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-item.user {
+  justify-content: flex-end;
+}
+
+.material-symbols-outlined.ai-avatar {
+  font-size: 2rem;
+}
+.chat-item-message-content {
+  font-size: 1rem;
+  max-width: 80%;
+
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+
+  word-wrap: break-word; /* Ensures long words break and wrap onto the next line */
+  word-break: break-word; /* Allows text to break if it's too long */
+  overflow-wrap: break-word; /* Ensures breaking in case of long unbreakable content */
+  display: inline-block; /* Ensures proper block behavior */
+}
+
+.chat-item.user .chat-item-message-content {
+  background-color: var(--blue);
+  color: white;
+}
