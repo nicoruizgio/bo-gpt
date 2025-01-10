@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ChatMessage from "../chat-message/ChatMessage";
+import ChatMessage from "./chat-message/ChatMessage";
 import { fetchChatCompletion } from "../../api/api";
 import "./Chat.css";
 

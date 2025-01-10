@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./ChatScreen.css";
-import Chat from "../components/chat/Chat";
-import config from "../config/config.json";
+import Chat from "../../components/chat/Chat";
+import config from "../../config/config.json";
 
 const ChatScreen = () => {
   const [chatLog, setChatLog] = useState([]);
