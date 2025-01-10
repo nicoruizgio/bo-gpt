@@ -6,7 +6,7 @@ const Introduction = () => {
   const navigate = useNavigate();
 
   const hanldeStart = () => {
-    navigate("/chat");
+    navigate("/rating");
   };
 
   return (

@@ -1,15 +1,11 @@
 import React, { useState } from "react";
-import "./ChatScreen.css";
+import "./RatingScreen.css";
 import Chat from "../../components/chat/Chat";
 import config from "../../config/config.json";
 
-const ChatScreen = () => {
+const RatingScreen = () => {
   const [chatLog, setChatLog] = useState([]);
-  const [systemPrompt, setSystemPrompt] = useState("");
-  const [useOpenRouter, setUseOpenRouter] = useState(false);
-  const [selectedOpenRouterModel, setSelectedOpenRouterModel] =
-    useState("GPT-4o");
-  const [knowledgeDataSet, setKnowledgeDataSet] = useState("");
+  const maxNumberOfMessages = 3;
 
   return (
     <div className="chat-screen">
@@ -20,9 +16,10 @@ const ChatScreen = () => {
         knowledgeDataSet={config.knowledgeDataSet}
         chatLog={chatLog}
         setChatLog={setChatLog}
+        maxNumberOfMessages={maxNumberOfMessages}
       />
     </div>
   );
 };
 
-export default ChatScreen;
+export default RatingScreen;

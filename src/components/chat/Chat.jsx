@@ -10,19 +10,30 @@ const Chat = ({
   knowledgeDataSet,
   chatLog,
   setChatLog,
+  maxNumberOfMessages,
 }) => {
   const [message, setMessage] = useState("");
+  const [userMessageCount, setUserMessageCount] = useState(0);
 
   async function handleSubmit() {
-    if (message.trim() === "") return;
+    if (message.trim() === "" || userMessageCount >= maxNumberOfMessages)
+      return;
 
     // Adding user message to chat log
     const userMessage = { id: Date.now(), role: "user", text: message };
     const updatedChatLog = [...chatLog, userMessage];
     setChatLog(updatedChatLog);
 
+    // Increment user message count
+    if ([1, 2, 3, 4, 5].includes(parseInt(message, 10))) {
+      setUserMessageCount((prevCount) => prevCount + 1);
+    }
+
     // Clear the input field
     setMessage("");
+
+    // **Stop fetching AI response if the user has reached the limit**
+    if (userMessageCount + 1 >= maxNumberOfMessages) return;
 
     // Fetching AI response
     try {
@@ -68,18 +79,22 @@ const Chat = ({
         <ChatMessage chatLog={chatLog} />
       </div>
       <div className="bottom-section">
-        <div className="input-container">
-          <textarea
-            className="text-input"
-            placeholder="Type something"
-            onKeyDown={handleKeyPress}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          ></textarea>
-          <span className="material-symbols-outlined" onClick={handleSubmit}>
-            send
-          </span>
-        </div>
+        {userMessageCount >= maxNumberOfMessages ? (
+          <button className="button next">Next</button>
+        ) : (
+          <div className="input-container">
+            <textarea
+              className="text-input"
+              placeholder="Type something"
+              onKeyDown={handleKeyPress}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            ></textarea>
+            <span className="material-symbols-outlined" onClick={handleSubmit}>
+              send
+            </span>
+          </div>
+        )}
       </div>
     </section>
   );

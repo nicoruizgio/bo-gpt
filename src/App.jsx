@@ -5,7 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import ChatScreen from "./screens/chat-screen/ChatScreen";
+import RatingScreen from "./screens/rating-screen/RatingScreen";
 import Introduction from "./screens/introduction-screen/Introduction-screen";
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/introduction" element={<Introduction />} />
-        <Route path="/chat" element={<ChatScreen />} />
+        <Route path="/rating" element={<RatingScreen />} />
         <Route path="*" element={<Navigate to="/introduction" />} />
       </Routes>
     </Router>

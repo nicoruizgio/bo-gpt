@@ -31,6 +31,8 @@ h1 {
 .bottom-section {
   width: 100%;
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .input-container {
@@ -93,4 +95,9 @@ h1 {
   font-size: 3rem;
   margin-right: 1rem;
   cursor: pointer;
+}
+
+.button.next {
+  margin-top: 2rem;
+  align-self: center;
 }
