@@ -10,22 +10,26 @@ const Chat = ({
   knowledgeDataSet,
   chatLog,
   setChatLog,
-  maxNumberOfMessages,
+  maxMessages,
+  handleNext,
 }) => {
   const [message, setMessage] = useState("");
   const [userMessageCount, setUserMessageCount] = useState(0);
 
   async function handleSubmit() {
-    if (message.trim() === "" || userMessageCount >= maxNumberOfMessages)
-      return;
+    // Do not submit empty messages
+    if (message.trim() === "") return;
+
+    // stop user from sending more messages if the limit is reached
+    if (maxMessages && userMessageCount >= maxMessages) return;
 
     // Adding user message to chat log
     const userMessage = { id: Date.now(), role: "user", text: message };
     const updatedChatLog = [...chatLog, userMessage];
     setChatLog(updatedChatLog);
 
-    // Increment user message count
-    if ([1, 2, 3, 4, 5].includes(parseInt(message, 10))) {
+    // Increment user message count only if the message is a number between 1 and 5 and we have provided a limit
+    if (maxMessages && [1, 2, 3, 4, 5].includes(parseInt(message, 10))) {
       setUserMessageCount((prevCount) => prevCount + 1);
     }
 
@@ -33,7 +37,7 @@ const Chat = ({
     setMessage("");
 
     // **Stop fetching AI response if the user has reached the limit**
-    if (userMessageCount + 1 >= maxNumberOfMessages) return;
+    if (maxMessages && userMessageCount + 1 >= maxMessages) return;
 
     // Fetching AI response
     try {
@@ -79,8 +83,10 @@ const Chat = ({
         <ChatMessage chatLog={chatLog} />
       </div>
       <div className="bottom-section">
-        {userMessageCount >= maxNumberOfMessages ? (
-          <button className="button next">Next</button>
+        {maxMessages && userMessageCount >= maxMessages ? (
+          <button className="button next" onClick={handleNext}>
+            Next
+          </button>
         ) : (
           <div className="input-container">
             <textarea
