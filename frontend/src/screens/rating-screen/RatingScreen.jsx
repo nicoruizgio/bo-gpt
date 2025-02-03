@@ -17,7 +17,27 @@ const RatingScreen = () => {
         useOpenRouter: config.useOpenRouter,
         selectedOpenRouterModel: config.selectedOpenRouterModel,
       });
+
       console.log(ratingSummary);
+
+      const participantId = localStorage.getItem("participantId");
+      if (!participantId) {
+        console.error("No participant ID found");
+        return;
+      }
+
+      // Store rating summary in PostgreSQL
+      const response = await fetch("http://localhost:5000/api/rating-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participantId, summary: ratingSummary }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to save rating summary");
+        return;
+      }
+
       navigate("/recommender");
     } catch (error) {
       console.error(error);
