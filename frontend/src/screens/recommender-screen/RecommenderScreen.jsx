@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Chat from "../../components/chat/Chat";
-import config from "../../config/config.json";
+import config from "../../config/config_recommender.json";
 
 const RecommenderScreen = () => {
   const [chatLog, setChatLog] = useState([]);
