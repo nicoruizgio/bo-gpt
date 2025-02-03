@@ -1,0 +1,26 @@
+const pool = require("../config/db");
+
+// Save rating summary linked to a participant
+const saveRatingSummary = async (req, res) => {
+  const { participantId, summary } = req.body;
+
+  if (!participantId || !summary) {
+    return res
+      .status(400)
+      .json({ error: "Participant ID and summary are required" });
+  }
+
+  try {
+    await pool.query(
+      "INSERT INTO ratings (participant_id, summary) VALUES ($1, $2)",
+      [participantId, summary]
+    );
+
+    res.status(201).json({ message: "Rating summary saved successfully" });
+  } catch (error) {
+    console.error("Error saving rating summary:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { saveRatingSummary };
