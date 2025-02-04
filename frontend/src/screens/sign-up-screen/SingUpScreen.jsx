@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { registerUser } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import "./SignUpScreen.css";
 
@@ -17,12 +18,11 @@ const SignUpScreen = () => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    // Basic validation
     if (
       !credentials.username ||
       !credentials.password ||
@@ -48,12 +48,15 @@ const SignUpScreen = () => {
       return;
     }
 
-    // Simulated API call
-    setTimeout(() => {
-      console.log("User registered:", credentials);
-      navigate("/introduction"); // Redirect to dashboard after successful registration
-      setLoading(false);
-    }, 2000);
+    try {
+      // Register user and store token
+      await registerUser(credentials.username, credentials.password);
+      navigate("/introduction"); // Redirect after authentication
+    } catch (err) {
+      setError(err.message);
+    }
+
+    setLoading(false);
   };
 
   return (

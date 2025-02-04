@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../api/api";
 import "./LogInScreen.css";
 
 const LogInScreen = () => {
@@ -7,9 +8,9 @@ const LogInScreen = () => {
     username: "",
     password: "",
   });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -27,19 +28,20 @@ const LogInScreen = () => {
       return;
     }
 
-    // Placeholder logic for login
-    setTimeout(() => {
-      if (credentials.username === "nico" && credentials.password === "123") {
-        navigate("/introduction"); // Simulate successful login
-      } else {
-        setError("Invalid username or password.");
-      }
-      setLoading(false);
-    }, 1000);
-  };
+    try {
+      const data = await loginUser(credentials.username, credentials.password); // Capture the returned data
 
-  const handleCreateAccount = () => {
-    navigate("/sign-up");
+      // Store token & user info in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("participantId", data.participantId);
+
+      navigate("/introduction"); // Redirect after successful login
+    } catch (err) {
+      setError(err.message);
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -77,13 +79,11 @@ const LogInScreen = () => {
             {loading ? <div className="spinner"></div> : "Log in"}
           </button>
         </form>
-
         <button
           className="button login signup"
-          type="button"
-          onClick={handleCreateAccount}
+          onClick={() => navigate("/sign-up")}
         >
-          Create new account
+          Create New Account
         </button>
       </div>
     </>

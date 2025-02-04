@@ -5,23 +5,8 @@ import { useNavigate } from "react-router-dom";
 const Introduction = () => {
   const navigate = useNavigate();
 
-  const handleStart = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/participant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("participantId", data.participantId); // Store ID in local storage
-        navigate("/rating");
-      } else {
-        console.error("Failed to create participant");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  const handleStart = () => {
+    navigate("/rating");
   };
 
   return (

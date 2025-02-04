@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -9,19 +8,28 @@ import RatingScreen from "./screens/rating-screen/RatingScreen";
 import Introduction from "./screens/introduction-screen/Introduction-screen";
 import RecommenderScreen from "./screens/recommender-screen/RecommenderScreen";
 import LogInScreen from "./screens/log-in-screen/LogInScreen";
-import SingUpScreen from "./screens/sign-up-screen/SingUpScreen";
+import SignUpScreen from "./screens/sign-up-screen/SingUpScreen";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <Router>
       <Routes>
-        <Route path="/log-in" element={<LogInScreen />} />
-        <Route path="/sign-up" element={<SingUpScreen />} />
-        <Route path="/introduction" element={<Introduction />} />
-        <Route path="/rating" element={<RatingScreen />} />
-        <Route path="/recommender" element={<RecommenderScreen />} />
+        {/* Public Routes */}
+        <Route element={<PublicRoute />}>
+          <Route path="/log-in" element={<LogInScreen />} />
+          <Route path="/sign-up" element={<SignUpScreen />} />
+        </Route>
+
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/introduction" element={<Introduction />} />
+          <Route path="/rating" element={<RatingScreen />} />
+          <Route path="/recommender" element={<RecommenderScreen />} />
+        </Route>
+
+        {/* Redirect unknown routes to Login */}
         <Route path="*" element={<Navigate to="/log-in" />} />
       </Routes>
     </Router>
