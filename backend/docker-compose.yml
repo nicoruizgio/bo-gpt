@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      args:
+        PORT: ${PORT} # Pass the .env PORT to Docker ARG
+    ports:
+      - "${PORT}:${PORT}" # Use dynamic port mapping
+    env_file:
+      - .env # Load environment variables
+    environment:
+      - PORT=${PORT} # Ensure the container reads the port
+      - DB_USER=${DB_USER} # Ensure backend gets DB credentials
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=postgres # IMPORTANT: Use service name, not localhost
+      - DB_PORT=${DB_PORT}
+    depends_on:
+      - postgres
+    restart: always # Ensures backend restarts if it crashes
+
+  postgres:
+    image: postgres:15
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:

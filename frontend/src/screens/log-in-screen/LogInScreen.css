@@ -1,0 +1,53 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.button.login {
+  align-self: center;
+  width: 60%;
+}
+
+.button.login.signup {
+  background-color: var(--bg-color);
+  font-size: 0.8rem;
+}
+
+.input {
+  background-color: var(--side-bar-container-color);
+  border: none;
+  border-radius: 0rem;
+  padding: 0.5rem;
+  width: 20rem;
+}
+
+header {
+  margin-top: 2rem;
+}
+
+.screen-container.login {
+  padding-top: 7rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  color: rgb(255, 112, 112);
+  font-size: 0.8rem;
+  text-align: center;
+}

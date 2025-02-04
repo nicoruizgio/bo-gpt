@@ -25,7 +25,7 @@ const Introduction = () => {
   };
 
   return (
-    <div className="screen-container">
+    <div className="screen-container introduction">
       <h2>Welcome to BO-GPT</h2>
       <p className="introduction-text">
         In the following page you will interact with an AI chatbot that will

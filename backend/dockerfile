@@ -1,0 +1,24 @@
+# Use Node.js LTS as the base image
+FROM node:18
+
+# Set the build-time variable (default: 5000)
+ARG PORT=5000
+
+# Set the runtime environment variable (uses ARG if available)
+ENV PORT=${PORT}
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy all project files
+COPY . .
+
+# Expose the port (uses ENV value)
+EXPOSE ${PORT}
+
+# Start the application using the environment variable
+CMD ["node", "server.js"]
