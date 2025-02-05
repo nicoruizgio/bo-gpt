@@ -4,13 +4,15 @@ import "./RatingScreen.css";
 import Chat from "../../components/chat/Chat";
 import config from "../../config/config_rating.json";
 import { fetchChatCompletion } from "../../api/api";
-import Cookies from "js-cookie"; // Import js-cookie
+import Spinner from "../../components/Spinner";
 
 const RatingScreen = () => {
   const [chatLog, setChatLog] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleNext = async () => {
+    setLoading(true);
     try {
       const ratingSummary = await fetchChatCompletion({
         chatLog,
@@ -18,8 +20,6 @@ const RatingScreen = () => {
         useOpenRouter: config.useOpenRouter,
         selectedOpenRouterModel: config.selectedOpenRouterModel,
       });
-
-      console.log(ratingSummary);
 
       // Store rating summary in PostgreSQL (NO need to send participantId)
       const response = await fetch("http://localhost:5000/api/rating-summary", {
@@ -37,6 +37,7 @@ const RatingScreen = () => {
       navigate("/recommender");
     } catch (error) {
       console.error(error);
+      setLoading(false);
     }
   };
 
@@ -51,6 +52,7 @@ const RatingScreen = () => {
         setChatLog={setChatLog}
         maxMessages={2}
         handleNext={handleNext}
+        loading={loading}
       />
     </div>
   );

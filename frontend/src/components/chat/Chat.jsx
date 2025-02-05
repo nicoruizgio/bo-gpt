@@ -3,6 +3,7 @@ import ChatMessage from "./chat-message/ChatMessage";
 import { fetchChatCompletion } from "../../api/api";
 import "./Chat.css";
 import HeaderComponent from "../HeaderComponent";
+import Spinner from "../Spinner";
 
 const Chat = ({
   systemPrompt,
@@ -13,6 +14,7 @@ const Chat = ({
   setChatLog,
   maxMessages,
   handleNext,
+  loading,
 }) => {
   const [message, setMessage] = useState("");
   const [userMessageCount, setUserMessageCount] = useState(0);
@@ -31,11 +33,8 @@ const Chat = ({
     // Use a local variable to track the new count
     let newCount = userMessageCount;
     if (maxMessages && isValidRating) {
-      console.log("valid rating:", parsedMessage);
       newCount = userMessageCount + 1;
       setUserMessageCount(newCount);
-    } else {
-      console.log("invalid rating:", parsedMessage);
     }
 
     setMessage("");
@@ -87,7 +86,7 @@ const Chat = ({
       <div className="bottom-section">
         {maxMessages && userMessageCount >= maxMessages ? (
           <button className="button next" onClick={handleNext}>
-            Next
+            {loading ? <Spinner /> : "Next"}
           </button>
         ) : (
           <div className="input-container">

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/api";
 import "./LogInScreen.css";
 import HeaderComponent from "../../components/HeaderComponent";
+import Spinner from "../../components/Spinner";
 
 const LogInScreen = () => {
   const [credentials, setCredentials] = useState({
@@ -75,7 +76,7 @@ const LogInScreen = () => {
             />
           </label>
           <button className="button login" type="submit" disabled={loading}>
-            {loading ? <div className="spinner"></div> : "Log in"}
+            {loading ? <Spinner /> : "Log in"}
           </button>
         </form>
         <button
