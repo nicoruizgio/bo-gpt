@@ -1,9 +1,16 @@
 const { getOpenAIInstance } = require("../config/openai");
-const { encodingForModel, get_encoding } = require("tiktoken");
+const { get_encoding } = require("tiktoken");
 
 // Get completion from OpenAI API
 const getCompletion = async (req, res) => {
   try {
+    // Set headers to encourage streaming and disable caching/buffering.
+    res.setHeader("Content-Type", "text/plain");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    // If available, flush headers immediately.
+    if (res.flushHeaders) res.flushHeaders();
+
     const {
       systemPrompt,
       chatLog,
@@ -12,18 +19,20 @@ const getCompletion = async (req, res) => {
       knowledgeDataSet,
     } = req.body;
 
+    if (!chatLog) {
+      throw new Error("chatLog is undefined. Please provide a valid chatLog.");
+    }
+
     const model = useOpenRouter ? selectedOpenRouterModel : "gpt-4o";
-    const dataset = knowledgeDataSet ? `\nDataset:\n${knowledgeDataSet}` : ""; // Include dataset if available
+    const dataset = knowledgeDataSet ? `\nDataset:\n${knowledgeDataSet}` : "";
+    const openai = getOpenAIInstance(useOpenRouter);
 
-    const openai = getOpenAIInstance(useOpenRouter); // Get the appropriate OpenAI instance
-
-    // Append dataset to the system prompt
     const updatedSystemPrompt = `
-    ${systemPrompt}
-    
-    Dataset: 
-    ${dataset}
-    `;
+${systemPrompt}
+
+Dataset: 
+${dataset}
+`;
 
     const conversation_history = [
       { role: "system", content: updatedSystemPrompt },
@@ -33,34 +42,48 @@ const getCompletion = async (req, res) => {
       })),
     ];
 
-    const encoding = get_encoding("cl100k_base"); // Use the correct encoding for the model
+    const encoding = get_encoding("cl100k_base");
 
     console.log("Conversation History:");
     console.log(conversation_history);
 
-    // Concatenate all `content` fields into a single string
     const fullConversation = conversation_history
       .map((msg) => msg.content)
       .join("\n");
 
-    // Encode the concatenated conversation
     const encodedConversation = encoding.encode(fullConversation);
-    const tokens = encodedConversation.length; // Get the total token count
-
+    const tokens = encodedConversation.length;
     console.log(`Total Tokens: ${tokens}\n`);
 
-    // Free the encoding resource
     encoding.free();
 
-    const response = await openai.chat.completions.create({
-      model: model,
+    // Request the streaming completion from OpenAI
+    const responseStream = await openai.chat.completions.create({
+      model,
+      stream: true,
       messages: conversation_history,
       max_tokens: 5000,
     });
 
-    res.status(200).json({ completion: response.choices[0].message.content });
+    // Process the response as an async iterable.
+    for await (const chunk of responseStream) {
+      // Check if the stream has finished.
+      if (chunk.choices[0].finish_reason === "stop") {
+        res.end();
+        break;
+      }
+      // Extract text from the current chunk.
+      const text = chunk.choices[0].delta?.content;
+      if (text) {
+        res.write(text);
+        // Flush the chunk immediately if possible.
+        if (res.flush) {
+          res.flush();
+        }
+      }
+    }
   } catch (error) {
-    console.error("Error occurred:", error);
+    console.error("Error in getCompletion:", error);
     res.status(500).json({ error: error.message });
   }
 };
