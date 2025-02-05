@@ -4,6 +4,7 @@ import "./RatingScreen.css";
 import Chat from "../../components/chat/Chat";
 import config from "../../config/config_rating.json";
 import { fetchChatCompletion } from "../../api/api";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const RatingScreen = () => {
   const [chatLog, setChatLog] = useState([]);
@@ -20,17 +21,12 @@ const RatingScreen = () => {
 
       console.log(ratingSummary);
 
-      const participantId = localStorage.getItem("participantId");
-      if (!participantId) {
-        console.error("No participant ID found");
-        return;
-      }
-
-      // Store rating summary in PostgreSQL
+      // Store rating summary in PostgreSQL (NO need to send participantId)
       const response = await fetch("http://localhost:5000/api/rating-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ participantId, summary: ratingSummary }),
+        credentials: "include", // Ensure cookies are sent
+        body: JSON.stringify({ summary: ratingSummary }), // No participantId needed
       });
 
       if (!response.ok) {

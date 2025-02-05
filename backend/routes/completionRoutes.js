@@ -6,6 +6,6 @@ const autthMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.post("/completion", getCompletion, autthMiddleware);
-router.post("/rating-summary", saveRatingSummary);
+router.post("/rating-summary", autthMiddleware, saveRatingSummary);
 
 module.exports = router;

@@ -18,29 +18,34 @@ const Chat = ({
   const [userMessageCount, setUserMessageCount] = useState(0);
 
   async function handleSubmit() {
-    // Do not submit empty messages
     if (message.trim() === "") return;
-
-    // stop user from sending more messages if the limit is reached
     if (maxMessages && userMessageCount >= maxMessages) return;
 
-    // Adding user message to chat log
     const userMessage = { id: Date.now(), role: "user", text: message };
     const updatedChatLog = [...chatLog, userMessage];
     setChatLog(updatedChatLog);
 
-    // Increment user message count only if the message is a number between 1 and 5 and we have provided a limit
-    if (maxMessages && [1, 2, 3, 4, 5].includes(parseInt(message, 10))) {
-      setUserMessageCount((prevCount) => prevCount + 1);
+    const parsedMessage = parseInt(message, 10);
+    const isValidRating = [1, 2, 3, 4, 5].includes(parsedMessage);
+
+    // Use a local variable to track the new count
+    let newCount = userMessageCount;
+    if (maxMessages && isValidRating) {
+      console.log("valid rating:", parsedMessage);
+      newCount = userMessageCount + 1;
+      setUserMessageCount(newCount);
+    } else {
+      console.log("invalid rating:", parsedMessage);
     }
 
-    // Clear the input field
     setMessage("");
 
-    // **Stop fetching AI response if the user has reached the limit**
-    if (maxMessages && userMessageCount + 1 >= maxMessages) return;
+    // Only stop fetching AI response if the valid message limit is reached.
+    if (maxMessages && isValidRating && newCount >= maxMessages) {
+      console.log("User has reached the message limit", newCount);
+      return;
+    }
 
-    // Fetching AI response
     try {
       const aiResponse = await fetchChatCompletion({
         chatLog: updatedChatLog,
@@ -50,13 +55,11 @@ const Chat = ({
         knowledgeDataSet,
       });
 
-      // Adding AI response to chat log
       setChatLog((prevChatLog) => [
         ...prevChatLog,
         { id: Date.now(), role: "ai", text: aiResponse },
       ]);
     } catch {
-      // Adding fallback error message
       setChatLog((prevChatLog) => [
         ...prevChatLog,
         {

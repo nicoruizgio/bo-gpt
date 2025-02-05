@@ -1,13 +1,11 @@
 const pool = require("../config/db");
 
-// Save rating summary linked to a participant
 const saveRatingSummary = async (req, res) => {
-  const { participantId, summary } = req.body;
+  const { summary } = req.body;
+  const participantId = req.user.id; // Get ID from authenticated user
 
-  if (!participantId || !summary) {
-    return res
-      .status(400)
-      .json({ error: "Participant ID and summary are required" });
+  if (!summary) {
+    return res.status(400).json({ error: "Summary is required" });
   }
 
   try {

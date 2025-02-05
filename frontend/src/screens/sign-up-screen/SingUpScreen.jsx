@@ -119,7 +119,7 @@ const SignUpScreen = () => {
         <div className="modal">
           <div className="modal-content">
             <p className="modal-title">Account created successfully!</p>
-            <span class="material-symbols-outlined">task_alt</span>
+            <span className="material-symbols-outlined">task_alt</span>
           </div>
         </div>
       )}
