@@ -46,16 +46,32 @@ const Chat = ({
     }
 
     try {
+      let currentText = "";
       const aiResponse = await fetchChatCompletion({
         chatLog: updatedChatLog,
         systemPrompt,
         useOpenRouter,
         selectedOpenRouterModel,
         knowledgeDataSet,
+        onUpdate: (partial) => {
+          currentText = partial;
+          // Optionally update a temporary "streaming" message in your UI
+          setChatLog((prevChatLog) => {
+            const aiMessage = {
+              id: "ai-stream",
+              role: "ai",
+              text: currentText,
+            };
+            // Remove previous streaming message (if exists) and add new one
+            const newLog = prevChatLog.filter((msg) => msg.id !== "ai-stream");
+            return [...newLog, aiMessage];
+          });
+        },
       });
 
+      // Once complete, update with the final text
       setChatLog((prevChatLog) => [
-        ...prevChatLog,
+        ...prevChatLog.filter((msg) => msg.id !== "ai-stream"),
         { id: Date.now(), role: "ai", text: aiResponse },
       ]);
     } catch {

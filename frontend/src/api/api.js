@@ -1,10 +1,12 @@
 // API call to fetch chat completion from the server
+// API call to fetch chat completion from the server with streaming
 export async function fetchChatCompletion({
   chatLog,
   systemPrompt,
   useOpenRouter,
   selectedOpenRouterModel,
   knowledgeDataSet,
+  onUpdate, // Callback function to update UI in real-time
 }) {
   try {
     const response = await fetch("http://localhost:5000/api/completion", {
@@ -26,8 +28,27 @@ export async function fetchChatCompletion({
       throw new Error("Failed to fetch response from server");
     }
 
-    const data = await response.json();
-    return data.completion;
+    // Stream processing logic
+    const reader = response.body
+      .pipeThrough(new TextDecoderStream()) // Convert binary to text
+      .getReader();
+
+    let completion = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      console.log("Received: ", value);
+
+      completion += value; // Accumulate received data
+
+      if (onUpdate) {
+        onUpdate(completion); // Update UI in real-time
+      }
+    }
+
+    return completion; // Return final completion string
   } catch (error) {
     console.error("Error: ", error);
     throw error;
