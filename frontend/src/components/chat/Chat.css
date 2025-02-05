@@ -1,12 +1,3 @@
-.header {
-  display: flex; /* Enables flexbox for horizontal layout */
-  align-items: center; /* Vertically aligns items */
-  justify-content: center; /* Centers the title horizontally */
-  position: relative; /* Allows precise positioning of the icon */
-  height: 60px; /* Adjust height as needed */
-  padding: 0 16px; /* Adds padding for spacing */
-}
-
 .material-symbols-outlined.sidebar.open {
   position: absolute; /* Allows it to stay fixed on the left */
   left: 16px; /* Positions it at the start of the page */
@@ -25,7 +16,8 @@ h1 {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 1.5rem;
+
+  padding-bottom: 1rem;
 }
 
 .bottom-section {

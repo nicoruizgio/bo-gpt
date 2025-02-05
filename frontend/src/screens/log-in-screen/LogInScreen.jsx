@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/api";
 import "./LogInScreen.css";
+import HeaderComponent from "../../components/HeaderComponent";
 
 const LogInScreen = () => {
   const [credentials, setCredentials] = useState({
@@ -46,9 +47,7 @@ const LogInScreen = () => {
 
   return (
     <>
-      <header>
-        <h1>BO-GPT</h1>
-      </header>
+      <HeaderComponent isLoggedIn={false} />
       <div className="screen-container login">
         <h2>Log In</h2>
         {error && <p className="error-message">{error}</p>}

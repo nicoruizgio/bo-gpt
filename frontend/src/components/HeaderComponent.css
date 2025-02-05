@@ -1,0 +1,48 @@
+.header-component {
+  margin-top: 1rem;
+  display: flex;
+
+  justify-content: flex-start;
+  position: relative;
+  width: 100%;
+  padding-left: 1rem;
+}
+.header-component p {
+  font-size: 0.7rem;
+}
+
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); /* Perfectly center */
+  text-align: center;
+}
+.user-info {
+  font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.header-component .material-symbols-outlined {
+  font-size: 1rem;
+}
+.signout-button {
+  cursor: pointer;
+}
+
+.username {
+  font-size: 0.7rem;
+}
+
+.username-container {
+  display: flex;
+  flex-direction: row;
+  gap: 0rem;
+}
+
+.sing-out-container {
+  display: flex;
+  flex-direction: row;
+  gap: 0rem;
+}

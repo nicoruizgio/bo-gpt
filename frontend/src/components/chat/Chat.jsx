@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ChatMessage from "./chat-message/ChatMessage";
 import { fetchChatCompletion } from "../../api/api";
 import "./Chat.css";
+import HeaderComponent from "../HeaderComponent";
 
 const Chat = ({
   systemPrompt,
@@ -76,9 +77,7 @@ const Chat = ({
 
   return (
     <section className="chat-area">
-      <header>
-        <h1>BO-GPT</h1>
-      </header>
+      <HeaderComponent isLoggedIn={true} />
       <div className="chat-log">
         <ChatMessage chatLog={chatLog} />
       </div>
