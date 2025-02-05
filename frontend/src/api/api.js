@@ -19,6 +19,7 @@ export async function fetchChatCompletion({
         selectedOpenRouterModel,
         knowledgeDataSet,
       }),
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -33,44 +34,13 @@ export async function fetchChatCompletion({
   }
 }
 
-// API call to generate configuration file from the server
-export async function handleDownloadConfig(config) {
-  try {
-    const response = await fetch("http://localhost:5000/api/generate-config", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(config),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to generate config file");
-    }
-
-    // Create a Blob from the response
-    const blob = await response.blob();
-
-    // Create a temporary link to download the file
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "chatbot-config.json"; // Filename
-    link.click();
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error("Error downloading config:", error);
-  }
-}
-
-const API_BASE_URL = "http://localhost:5000/api"; // Adjust based on your environment
-
 export const registerUser = async (username, password) => {
   try {
     const response = await fetch("http://localhost:5000/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
+      credentials: "include",
     });
 
     const data = await response.json();
@@ -79,9 +49,7 @@ export const registerUser = async (username, password) => {
     }
 
     // Store token & user info in localStorage
-    localStorage.setItem("token", data.token);
     localStorage.setItem("username", data.username);
-    localStorage.setItem("participantId", data.participantId);
 
     return data;
   } catch (error) {
@@ -96,6 +64,7 @@ export const loginUser = async (username, password) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
+      credentials: "include",
     });
 
     console.log("Raw response:", response); // Debugging step
@@ -123,6 +92,46 @@ export const loginUser = async (username, password) => {
     return data;
   } catch (error) {
     console.error("Login error:", error.message);
+    throw error;
+  }
+};
+
+// Function to check if user is authenticated based on server response
+export const isAuthenticated = async () => {
+  try {
+    const response = await fetch("http://localhost:5000/api/check-auth", {
+      method: "GET",
+      credentials: "include", // Make sure cookies are sent
+    });
+
+    if (response.status === 401) {
+      return false; // Token is missing or invalid, user is not authenticated
+    }
+
+    const data = await response.json();
+    return data.authenticated; // Return true or false based on the response
+  } catch (error) {
+    console.error("Auth check error:", error);
+    return false; // Handle fetch or network errors gracefully
+  }
+};
+
+// API call to log out user (clear token cookie)
+export const logoutUser = async () => {
+  try {
+    const response = await fetch("http://localhost:5000/api/logout", {
+      method: "POST",
+      credentials: "include", // Ensure cookies are sent with the request
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to log out");
+    }
+
+    // If successful, return a message (optional)
+    return { message: "Logged out successfully" };
+  } catch (error) {
+    console.error("Error during logout:", error);
     throw error;
   }
 };

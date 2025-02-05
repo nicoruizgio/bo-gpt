@@ -12,6 +12,9 @@ const SignUpScreen = () => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [modal, setModal] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -51,7 +54,11 @@ const SignUpScreen = () => {
     try {
       // Register user and store token
       await registerUser(credentials.username, credentials.password);
-      navigate("/introduction"); // Redirect after authentication
+      setModal(true);
+      setTimeout(() => {
+        setModal(false);
+        navigate("/log-in");
+      }, 3000);
     } catch (err) {
       setError(err.message);
     }
@@ -106,6 +113,16 @@ const SignUpScreen = () => {
           </button>
         </form>
       </div>
+
+      {/** Modal */}
+      {modal && (
+        <div className="modal">
+          <div className="modal-content">
+            <p className="modal-title">Account created successfully!</p>
+            <span class="material-symbols-outlined">task_alt</span>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -68,6 +68,14 @@ const loginUser = async (req, res) => {
       { expiresIn: "24h" }
     );
 
+    // Set token as HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true, // Prevents JavaScript access
+      secure: process.env.NODE_ENV === "production", // Set 'secure' flag in production
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+      sameSite: "Strict", // Makes the cookie available only on same-site requests
+    });
+
     // **DEBUGGING STEP: Log before sending response**
     console.log("Login successful. Sending response:", {
       token,
@@ -86,7 +94,14 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser };
+const logoutUser = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true, // Ensure the cookie is cleared properly
+    secure: process.env.NODE_ENV === "production", // Use secure flag in production
+    sameSite: "Strict",
+  });
+  res.status(200).json({ message: "Logged out successfully" });
+};
 
-// Ensure it is exported correctly
-module.exports = { registerUser, loginUser };
+// Ensure both functions are exported correctly
+module.exports = { registerUser, loginUser, logoutUser };

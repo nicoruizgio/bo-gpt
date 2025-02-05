@@ -2,7 +2,7 @@ const { getOpenAIInstance } = require("../config/openai");
 const { encodingForModel, get_encoding } = require("tiktoken");
 
 // Get completion from OpenAI API
-exports.getCompletion = async (req, res) => {
+const getCompletion = async (req, res) => {
   try {
     const {
       systemPrompt,
@@ -65,40 +65,4 @@ exports.getCompletion = async (req, res) => {
   }
 };
 
-// Generate configuration file
-exports.generateConfig = async (req, res) => {
-  try {
-    const {
-      systemPrompt,
-      useOpenRouter,
-      selectedOpenRouterModel,
-      knowledgeDataSet,
-      output,
-    } = req.body;
-
-    // Create the configuration object
-    const config = {
-      systemPrompt,
-      useOpenRouter,
-      selectedOpenRouterModel,
-      knowledgeDataSet,
-      output,
-    };
-
-    // Convert the configuration to a JSON string
-    const configJson = JSON.stringify(config, null, 2);
-
-    // Set headers to make the file downloadable
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=chatbot-config.json"
-    );
-    res.setHeader("Content-Type", "application/json");
-
-    // Send the JSON string as the response
-    res.status(200).send(configJson);
-  } catch (error) {
-    console.error("Error generating config file:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
+module.exports = { getCompletion };

@@ -1,12 +1,26 @@
+import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-
-// Function to check if user is authenticated
-const isAuthenticated = () => {
-  return !!localStorage.getItem("token"); // Ensure it returns true if a token exists
-};
+import { isAuthenticated } from "../api/api";
 
 const ProtectedRoute = () => {
-  return isAuthenticated() ? <Outlet /> : <Navigate to="/log-in" />;
+  const [authenticated, setAuthenticated] = useState(null); // Start with null (to handle loading state)
+
+  useEffect(() => {
+    // Check if the user is authenticated when the component mounts
+    const checkAuth = async () => {
+      const status = await isAuthenticated(); // Call the async function
+      setAuthenticated(status); // Update the state
+    };
+
+    checkAuth();
+  }, []); // Empty dependency array means this effect runs once when the component mounts
+
+  // Show loading state or navigate based on authentication
+  if (authenticated === null) {
+    return <div>Loading...</div>; // Or show a spinner, depending on your preference
+  }
+
+  return authenticated ? <Outlet /> : <Navigate to="/log-in" />;
 };
 
 export default ProtectedRoute;
