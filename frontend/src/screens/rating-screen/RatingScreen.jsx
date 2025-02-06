@@ -4,7 +4,7 @@ import "./RatingScreen.css";
 import Chat from "../../components/chat/Chat";
 import config from "../../config/config_rating.json";
 import { fetchChatCompletion } from "../../api/fetchCompletionApi";
-import Spinner from "../../components/Spinner";
+import { storeRatingSummary } from "../../api/storeRatingsApi";
 
 const RatingScreen = () => {
   const [chatLog, setChatLog] = useState([]);
@@ -14,23 +14,14 @@ const RatingScreen = () => {
   const handleNext = async () => {
     setLoading(true);
     try {
+      // Generate rating summary using chat completion API.
       const ratingSummary = await fetchChatCompletion({
         chatLog,
         systemPrompt: config.ratingSummaryPrompt,
       });
 
-      // Store rating summary in PostgreSQL (NO need to send participantId)
-      const response = await fetch("http://localhost:5000/api/rating-summary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // Ensure cookies are sent
-        body: JSON.stringify({ summary: ratingSummary }), // No participantId needed
-      });
-
-      if (!response.ok) {
-        console.error("Failed to save rating summary");
-        return;
-      }
+      // Store the rating summary via the new module.
+      await storeRatingSummary(ratingSummary);
 
       navigate("/recommender");
     } catch (error) {

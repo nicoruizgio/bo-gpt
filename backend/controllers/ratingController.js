@@ -21,4 +21,29 @@ const saveRatingSummary = async (req, res) => {
   }
 };
 
-module.exports = { saveRatingSummary };
+const fetchRatings = async (req, res) => {
+  try {
+    const participantId = req.user.id;
+
+    const query = `
+      SELECT summary
+      FROM ratings
+      WHERE participant_id = $1
+      ORDER BY created_at DESC
+    `;
+    const { rows } = await pool.query(query, [participantId]);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No ratings found for this user." });
+    }
+
+    res.status(200).json({ ratings: rows });
+  } catch (error) {
+    console.error("Error fetching user ratings:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { saveRatingSummary, fetchRatings };

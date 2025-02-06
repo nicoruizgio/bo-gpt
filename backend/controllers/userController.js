@@ -73,7 +73,7 @@ const loginUser = async (req, res) => {
       httpOnly: true, // Prevents JavaScript access
       secure: process.env.NODE_ENV === "production", // Set 'secure' flag in production
       maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-      sameSite: "Strict", // Makes the cookie available only on same-site requests
+      sameSite: "Lax", // Makes the cookie available only on same-site requests
     });
 
     // **DEBUGGING STEP: Log before sending response**
@@ -85,9 +85,7 @@ const loginUser = async (req, res) => {
 
     // **Send the response**
     res.setHeader("Content-Type", "application/json"); // Ensure JSON response
-    res
-      .status(200)
-      .json({ token, username: user.username, participantId: user.id });
+    res.status(200).json({ username: user.username, participantId: user.id });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ error: "Internal Server Error" });
