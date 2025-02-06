@@ -15,14 +15,14 @@ CREATE TABLE ratings (
 );
 
 
--- Create News Articles Table
-CREATE TABLE news_articles (
+CREATE TABLE news_articles_flexible (
     id SERIAL PRIMARY KEY,
-    message_id BIGINT UNIQUE,
+    message_id TEXT,         -- now stored as text, not BIGINT
     title TEXT,
     sender TEXT,
     link TEXT,
-    created_date TIMESTAMP,
+    created_date TEXT,       -- store date/time as text for flexibility
     text TEXT,
-    embedding VECTOR(1536) -- assuming you're using OpenAI's text-embedding-ada-002
+    image_url TEXT,          -- renamed from enclosure to image_url for clarity
+    embedding VECTOR(1536)   -- remains unchanged (used for vector search)
 );
