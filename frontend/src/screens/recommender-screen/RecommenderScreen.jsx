@@ -8,9 +8,7 @@ const RecommenderScreen = () => {
     <div className="chat-screen">
       <Chat
         systemPrompt={config.systemPrompt}
-        useOpenRouter={config.useOpenRouter}
-        selectedOpenRouterModel={config.selectedOpenRouterModel}
-        knowledgeDataSet={config.knowledgeDataSet}
+        newsForRating={config.newsForRating}
         chatLog={chatLog}
         setChatLog={setChatLog}
       />

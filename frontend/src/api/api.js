@@ -5,7 +5,7 @@ export async function fetchChatCompletion({
   systemPrompt,
   useOpenRouter,
   selectedOpenRouterModel,
-  knowledgeDataSet,
+  newsForRating,
   onUpdate, // Callback function to update UI in real-time
 }) {
   try {
@@ -17,9 +17,7 @@ export async function fetchChatCompletion({
       body: JSON.stringify({
         chatLog,
         systemPrompt,
-        useOpenRouter,
-        selectedOpenRouterModel,
-        knowledgeDataSet,
+        newsForRating,
       }),
       credentials: "include",
     });

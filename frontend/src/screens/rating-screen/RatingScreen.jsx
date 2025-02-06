@@ -17,8 +17,6 @@ const RatingScreen = () => {
       const ratingSummary = await fetchChatCompletion({
         chatLog,
         systemPrompt: config.ratingSummaryPrompt,
-        useOpenRouter: config.useOpenRouter,
-        selectedOpenRouterModel: config.selectedOpenRouterModel,
       });
 
       // Store rating summary in PostgreSQL (NO need to send participantId)
@@ -45,9 +43,7 @@ const RatingScreen = () => {
     <div className="chat-screen">
       <Chat
         systemPrompt={config.systemPrompt}
-        useOpenRouter={config.useOpenRouter}
-        selectedOpenRouterModel={config.selectedOpenRouterModel}
-        knowledgeDataSet={config.knowledgeDataSet}
+        newsForRating={config.newsForRating}
         chatLog={chatLog}
         setChatLog={setChatLog}
         maxMessages={2}

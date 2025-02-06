@@ -7,9 +7,8 @@ import Spinner from "../Spinner";
 
 const Chat = ({
   systemPrompt,
-  useOpenRouter,
-  selectedOpenRouterModel,
-  knowledgeDataSet,
+
+  newsForRating,
   chatLog,
   setChatLog,
   maxMessages,
@@ -50,9 +49,8 @@ const Chat = ({
       const aiResponse = await fetchChatCompletion({
         chatLog: updatedChatLog,
         systemPrompt,
-        useOpenRouter,
-        selectedOpenRouterModel,
-        knowledgeDataSet,
+
+        newsForRating,
         onUpdate: (partial) => {
           currentText = partial;
           // Optionally update a temporary "streaming" message in your UI

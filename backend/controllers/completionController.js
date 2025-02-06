@@ -14,18 +14,17 @@ const getCompletion = async (req, res) => {
     const {
       systemPrompt,
       chatLog,
-      useOpenRouter,
-      selectedOpenRouterModel,
-      knowledgeDataSet,
+
+      newsForRating,
     } = req.body;
 
     if (!chatLog) {
       throw new Error("chatLog is undefined. Please provide a valid chatLog.");
     }
 
-    const model = useOpenRouter ? selectedOpenRouterModel : "gpt-4o";
-    const dataset = knowledgeDataSet ? `\nDataset:\n${knowledgeDataSet}` : "";
-    const openai = getOpenAIInstance(useOpenRouter);
+    const model = "gpt-4o";
+    const dataset = newsForRating ? `\nDataset:\n${newsForRating}` : "";
+    const openai = getOpenAIInstance();
 
     const updatedSystemPrompt = `
 ${systemPrompt}
