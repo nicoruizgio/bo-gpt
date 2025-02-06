@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { registerUser } from "../../api/api";
+import { registerUser } from "../../api/registerApi";
 import { useNavigate } from "react-router-dom";
 import "./SignUpScreen.css";
 import HeaderComponent from "../../components/HeaderComponent";

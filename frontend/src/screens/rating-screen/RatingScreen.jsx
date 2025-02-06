@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./RatingScreen.css";
 import Chat from "../../components/chat/Chat";
 import config from "../../config/config_rating.json";
-import { fetchChatCompletion } from "../../api/api";
+import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import Spinner from "../../components/Spinner";
 
 const RatingScreen = () => {

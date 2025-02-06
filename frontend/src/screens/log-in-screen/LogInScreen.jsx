@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../api/api";
+import { loginUser } from "../../api/loginApi";
 import "./LogInScreen.css";
 import HeaderComponent from "../../components/HeaderComponent";
 import Spinner from "../../components/Spinner";

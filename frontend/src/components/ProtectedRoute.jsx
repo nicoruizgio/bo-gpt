@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { isAuthenticated } from "../api/api";
+import { isAuthenticated } from "../api/authenticationApi";
 
 const ProtectedRoute = () => {
   const [authenticated, setAuthenticated] = useState(null); // Start with null (to handle loading state)

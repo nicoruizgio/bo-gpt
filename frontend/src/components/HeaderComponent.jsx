@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "../api/api";
+import { logoutUser } from "../api/logoutApi";
 import "./HeaderComponent.css";
 
 const HeaderComponent = ({ isLoggedIn }) => {

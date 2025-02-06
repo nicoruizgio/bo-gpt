@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import ChatMessage from "./chat-message/ChatMessage";
-import { fetchChatCompletion } from "../../api/api";
+import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import "./Chat.css";
 import HeaderComponent from "../HeaderComponent";
 import Spinner from "../Spinner";
 
 const Chat = ({
   systemPrompt,
-
   newsForRating,
   chatLog,
   setChatLog,
