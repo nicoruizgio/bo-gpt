@@ -113,9 +113,7 @@ const Chat = ({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             ></textarea>
-            <span className="material-symbols-outlined" onClick={handleSubmit}>
-              send
-            </span>
+            <div className="button send-message">Send</div>
           </div>
         )}
       </div>

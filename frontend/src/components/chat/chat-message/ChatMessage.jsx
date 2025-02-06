@@ -1,6 +1,8 @@
 import React from "react";
 import "./ChatMessage.css";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm"; // Supports GitHub-flavored Markdown (tables, links)
+import rehypeRaw from "rehype-raw"; // Allows rendering raw HTML
 
 const ChatMessage = ({ chatLog }) => {
   return (
@@ -13,8 +15,13 @@ const ChatMessage = ({ chatLog }) => {
             </span>
           )}
           <div className="chat-item-message-content">
-            {message.role == "ai" ? (
-              <ReactMarkdown>{message.text}</ReactMarkdown>
+            {message.role === "ai" ? (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+              >
+                {message.text}
+              </ReactMarkdown>
             ) : (
               message.text
             )}

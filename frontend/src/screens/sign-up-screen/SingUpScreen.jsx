@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { registerUser } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import "./SignUpScreen.css";
+import HeaderComponent from "../../components/HeaderComponent";
 
 const SignUpScreen = () => {
   const [credentials, setCredentials] = useState({
@@ -68,9 +69,7 @@ const SignUpScreen = () => {
 
   return (
     <>
-      <header>
-        <h1>BO-GPT</h1>
-      </header>
+      <HeaderComponent isLoggedIn={false} />
       <div className="screen-container login">
         <h2>Create New Account</h2>
         {error && <p className="error-message">{error}</p>}

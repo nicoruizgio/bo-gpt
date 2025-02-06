@@ -35,3 +35,8 @@ header {
   font-size: 0.8rem;
   text-align: center;
 }
+
+.create-new-account {
+  cursor: pointer;
+  font-size: 0.8rem;
+}

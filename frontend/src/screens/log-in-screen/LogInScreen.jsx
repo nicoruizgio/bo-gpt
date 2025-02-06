@@ -33,11 +33,6 @@ const LogInScreen = () => {
     try {
       const data = await loginUser(credentials.username, credentials.password); // Capture the returned data
 
-      // Store token & user info in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("participantId", data.participantId);
-
       navigate("/introduction"); // Redirect after successful login
     } catch (err) {
       setError(err.message);
@@ -79,12 +74,9 @@ const LogInScreen = () => {
             {loading ? <Spinner /> : "Log in"}
           </button>
         </form>
-        <button
-          className="button login signup"
-          onClick={() => navigate("/sign-up")}
-        >
+        <p className="create-new-account" onClick={() => navigate("/sign-up")}>
           Create New Account
-        </button>
+        </p>
       </div>
     </>
   );

@@ -17,7 +17,7 @@ h1 {
   justify-content: space-between;
   align-items: center;
 
-  padding-bottom: 1rem;
+  padding-bottom: 2rem;
 }
 
 .bottom-section {
@@ -64,11 +64,11 @@ h1 {
 }
 
 .text-input {
-  width: 60%;
+  width: 50%;
   padding: 1rem 1rem;
   border: none;
   border-radius: 1rem;
-  min-height: 5rem;
+  min-height: 8rem;
   background-color: rgba(255, 255, 255, 0.068);
   resize: none;
   font-family: inherit;
@@ -92,4 +92,15 @@ h1 {
 .button.next {
   margin-top: 2rem;
   align-self: center;
+}
+
+.button.send-message {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  background-color: var(--blue);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: auto 1rem;
 }

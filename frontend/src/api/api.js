@@ -69,9 +69,6 @@ export const registerUser = async (username, password) => {
       throw new Error(data.error || "Failed to register user.");
     }
 
-    // Store token & user info in localStorage
-    localStorage.setItem("username", data.username);
-
     return data;
   } catch (error) {
     console.error("Registration error:", error);
@@ -105,10 +102,7 @@ export const loginUser = async (username, password) => {
       throw new Error(data.error || "Login failed.");
     }
 
-    // Store token & user info in localStorage
-    localStorage.setItem("token", data.token);
     localStorage.setItem("username", data.username);
-    localStorage.setItem("participantId", data.participantId);
 
     return data;
   } catch (error) {
