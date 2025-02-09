@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ChatMessage from "./chat-message/ChatMessage";
 import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import "./Chat.css";
@@ -6,13 +6,13 @@ import HeaderComponent from "../HeaderComponent";
 import Spinner from "../Spinner";
 
 const Chat = ({
-  systemPrompt,
-  newsForRating,
+  screenName,
   chatLog,
   setChatLog,
   maxMessages,
   handleNext,
   loading,
+  recommender,
 }) => {
   const [message, setMessage] = useState("");
   const [userMessageCount, setUserMessageCount] = useState(0);
@@ -47,9 +47,7 @@ const Chat = ({
       let currentText = "";
       const aiResponse = await fetchChatCompletion({
         chatLog: updatedChatLog,
-        systemPrompt,
-
-        newsForRating,
+        screenName,
         onUpdate: (partial) => {
           currentText = partial;
           // Optionally update a temporary "streaming" message in your UI

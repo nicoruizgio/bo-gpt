@@ -14,18 +14,18 @@ const RatingScreen = () => {
   const handleNext = async () => {
     setLoading(true);
     try {
-      // Generate rating summary using chat completion API.
-      const ratingSummary = await fetchChatCompletion({
-        chatLog,
-        systemPrompt: config.ratingSummaryPrompt,
-      });
+      const response = await storeRatingSummary(chatLog);
 
-      // Store the rating summary via the new module.
-      await storeRatingSummary(ratingSummary);
+      if (!response.ok) {
+        throw new Error("Failed to save rating summary");
+      }
 
+      console.log("Rating summary saved successfully");
       navigate("/recommender");
     } catch (error) {
-      console.error(error);
+      console.error("Error in handleNext:", error);
+      alert("Failed to save rating summary. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
@@ -33,8 +33,7 @@ const RatingScreen = () => {
   return (
     <div className="chat-screen">
       <Chat
-        systemPrompt={config.systemPrompt}
-        newsForRating={config.newsForRating}
+        screenName={"rating_screen"}
         chatLog={chatLog}
         setChatLog={setChatLog}
         maxMessages={2}

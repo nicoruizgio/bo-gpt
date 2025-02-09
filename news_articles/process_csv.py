@@ -14,11 +14,11 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Connect to PostgreSQL
 conn = psycopg2.connect(
-    dbname=os.getenv("DB_NAME") or "pgvector_db",
-    user=os.getenv("DB_USER") or "postgres",
-    password=os.getenv("DB_PASSWORD") or "mysecretpassword",
-    host=os.getenv("DB_HOST") or "localhost",
-    port=os.getenv("DB_PORT") or "5433"
+    dbname="pgvector-dev",
+    user="postgres", 
+    password="UyGpcA6!VeTfW3S",
+    host="134.102.239.21" ,
+    port="5432" ,
 )
 cursor = conn.cursor()
 
@@ -39,7 +39,7 @@ def truncate_text_to_token_limit(text, max_tokens=8000, model="text-embedding-ad
     return text
 
 # Batch size for API calls (you can adjust this)
-BATCH_SIZE = 20
+BATCH_SIZE = 100
 
 # Prepare a list to hold the rows to process
 rows_data = []

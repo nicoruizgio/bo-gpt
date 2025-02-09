@@ -7,10 +7,10 @@ const RecommenderScreen = () => {
   return (
     <div className="chat-screen">
       <Chat
-        systemPrompt={config.systemPrompt}
-        newsForRating={config.newsForRating}
         chatLog={chatLog}
         setChatLog={setChatLog}
+        recommender={true}
+        screenName={"recommender-screen"}
       />
     </div>
   );

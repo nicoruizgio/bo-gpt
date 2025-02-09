@@ -1,7 +1,7 @@
 import { API_URL } from "./apiurl";
 
 export async function fetchUserRating() {
-  const response = await fetch(`${API_URL}/api/ratings/get-ratings`, {
+  const response = await fetch(`${API_URL}/api/get-ratings`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // Ensure cookies are sent with the request

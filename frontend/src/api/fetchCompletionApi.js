@@ -2,11 +2,9 @@ import { API_URL } from "./apiurl";
 
 export async function fetchChatCompletion({
   chatLog,
-  systemPrompt,
-  useOpenRouter,
-  selectedOpenRouterModel,
-  newsForRating,
+  screenName,
   onUpdate, // Callback function to update UI in real-time
+  summatyMode = false,
 }) {
   try {
     const response = await fetch(`${API_URL}/api/completion`, {
@@ -16,8 +14,8 @@ export async function fetchChatCompletion({
       },
       body: JSON.stringify({
         chatLog,
-        systemPrompt,
-        newsForRating,
+        screenName,
+        summatyMode,
       }),
       credentials: "include",
     });
