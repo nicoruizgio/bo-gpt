@@ -1,5 +1,7 @@
+import { API_URL } from "./apiurl";
+
 export async function storeRatingSummary(summary) {
-  const response = await fetch("http://localhost:5000/api/rating-summary", {
+  const response = await fetch(`${API_URL}/api/rating-summary`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // Ensure cookies are sent

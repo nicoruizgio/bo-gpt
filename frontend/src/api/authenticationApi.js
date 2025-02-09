@@ -1,6 +1,8 @@
+import { API_URL } from "./apiurl";
+
 export const isAuthenticated = async () => {
   try {
-    const response = await fetch("http://localhost:5000/api/check-auth", {
+    const response = await fetch(`${API_URL}/api/check-auth`, {
       method: "GET",
       credentials: "include", // Make sure cookies are sent
     });

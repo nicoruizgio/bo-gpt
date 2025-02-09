@@ -1,3 +1,6 @@
+--- Add pgvector extension
+CREATE EXTENSION vector;
+
 -- Create Participants Table
 CREATE TABLE participants (
     id SERIAL PRIMARY KEY,

@@ -1,3 +1,5 @@
+import { API_URL } from "./apiurl";
+
 export async function fetchChatCompletion({
   chatLog,
   systemPrompt,
@@ -7,7 +9,7 @@ export async function fetchChatCompletion({
   onUpdate, // Callback function to update UI in real-time
 }) {
   try {
-    const response = await fetch("http://localhost:5000/api/completion", {
+    const response = await fetch(`${API_URL}/api/completion`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

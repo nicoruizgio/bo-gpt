@@ -1,6 +1,8 @@
+import { API_URL } from "./apiurl";
+
 export const logoutUser = async () => {
   try {
-    const response = await fetch("http://localhost:5000/api/logout", {
+    const response = await fetch(`${API_URL}/api/logout`, {
       method: "POST",
       credentials: "include", // Ensure cookies are sent with the request
     });

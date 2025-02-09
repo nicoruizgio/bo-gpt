@@ -1,12 +1,11 @@
+import { API_URL } from "./apiurl";
+
 export async function fetchUserRating() {
-  const response = await fetch(
-    "http://localhost:5000/api/ratings/get-ratings",
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include", // Ensure cookies are sent with the request
-    }
-  );
+  const response = await fetch(`${API_URL}/api/ratings/get-ratings`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include", // Ensure cookies are sent with the request
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch user ratings");
