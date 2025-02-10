@@ -20,20 +20,20 @@ CREATE TABLE ratings (
 
 CREATE TABLE news_articles_flexible (
     id SERIAL PRIMARY KEY,
-    message_id TEXT,         -- now stored as text, not BIGINT
+    message_id TEXT,         
     title TEXT,
     sender TEXT,
     link TEXT,
-    created_date TEXT,       -- store date/time as text for flexibility
+    created_date TEXT,      
     text TEXT,
-    image_url TEXT,          -- renamed from enclosure to image_url for clarity
-    embedding VECTOR(1536)   -- remains unchanged (used for vector search)
+    image_url TEXT,         
+    embedding VECTOR(1536)   
 );
 
 
 CREATE TABLE chat_contexts (
     id SERIAL PRIMARY KEY,
-    screen_name VARCHAR(255) UNIQUE NOT NULL, -- Identifier for different screens
+    screen_name VARCHAR(255) UNIQUE NOT NULL, 
     system_prompt TEXT NOT NULL, 
     news_for_rating TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
