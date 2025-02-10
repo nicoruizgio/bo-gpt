@@ -9,8 +9,7 @@ const RecommenderScreen = () => {
       <Chat
         chatLog={chatLog}
         setChatLog={setChatLog}
-        recommender={true}
-        screenName={"recommender-screen"}
+        screenName={"recommender_screen"}
       />
     </div>
   );

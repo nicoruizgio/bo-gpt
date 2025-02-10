@@ -12,7 +12,6 @@ const Chat = ({
   maxMessages,
   handleNext,
   loading,
-  recommender,
 }) => {
   const [message, setMessage] = useState("");
   const [userMessageCount, setUserMessageCount] = useState(0);
