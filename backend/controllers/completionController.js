@@ -1,19 +1,15 @@
 const { getOpenAIInstance } = require("../config/openai");
 const { get_encoding } = require("tiktoken");
-const pool = require("../config/db"); // PostgreSQL connection pool
+const pool = require("../config/db");
 
 const getCompletion = async (req, res) => {
   try {
     const { chatLog, screenName } = req.body;
     console.log("Screen Name:", JSON.stringify(screenName));
-
     if (!screenName || !chatLog) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
-    console.log("🔹 User Request:", req.user); // Debug user authentication
-
-    // Fetch system prompt from the database
     const result = await pool.query(
       "SELECT system_prompt, news_for_rating FROM chat_contexts WHERE screen_name = $1",
       [screenName]
@@ -23,20 +19,17 @@ const getCompletion = async (req, res) => {
       return res.status(404).json({ error: "Screen configuration not found" });
     }
 
-    // Save the base system prompt separately so we can rebuild the prompt on each request
     const baseSystemPrompt = result.rows[0].system_prompt;
     let updatedSystemPrompt = baseSystemPrompt;
     let retrievedArticles = "";
     let userPreferences = "No preferences available.";
 
-    // 🟢 **RAG Mode: News Recommendations**
+    // **RAG Mode: News Recommendations**
     if (screenName === "recommender_screen") {
       // Get the latest user message
       const userMessage = chatLog[chatLog.length - 1]?.text || "";
 
-      // Ensure user is authenticated
       if (!req.user || !req.user.id) {
-        // console.error("❌ User authentication failed! No user ID found.");
         return res.status(403).json({ error: "User not authenticated" });
       }
 
@@ -49,25 +42,25 @@ const getCompletion = async (req, res) => {
       if (userPrefQuery.rows.length > 0) {
         userPreferences = userPrefQuery.rows[0].summary;
       } else {
-        // console.error("❌ No user preferences found for User ID:", req.user.id);
+        console.error("No user preferences found for User ID:", req.user.id);
       }
 
-      // Generate embedding for query (user preferences + latest user message)
+      // Generate embedding for query
       const openai = getOpenAIInstance();
       const embeddingResponse = await openai.embeddings.create({
         model: "text-embedding-ada-002",
-        input: ` ${userMessage}`,
+        input: ` ${userPreferences}`,
       });
 
       const queryEmbedding = embeddingResponse.data[0].embedding;
 
-      // Convert the embedding array into the required string format (with square brackets)
+      // Convert the embedding array into the required string format
       const embeddingStr = `[${queryEmbedding.join(",")}]`;
 
       // Perform vector search for relevant news articles using the proper vector literal
       const articlesQuery = await pool.query(
         `SELECT id, title, text, sender, link, created_date FROM news_articles_flexible 
-         ORDER BY embedding <-> $1 LIMIT 5;`,
+         ORDER BY embedding <-> $1 LIMIT 10;`,
         [embeddingStr]
       );
 
@@ -85,9 +78,10 @@ const getCompletion = async (req, res) => {
       } else {
         retrievedArticles = "No relevant articles found.";
       }
-
-      updatedSystemPrompt = `${baseSystemPrompt}\n\nUser Preferences: ${userPreferences}\n\nRelevant Articles:\n${retrievedArticles}`;
+      updatedSystemPrompt = `${baseSystemPrompt}\n\nSelected Articles:\n${retrievedArticles}`;
     }
+
+    //console.log("🔹 System Prompt:", updatedSystemPrompt);
 
     if (screenName === "rating_screen") {
       updatedSystemPrompt = `${baseSystemPrompt}\n\n News for Rating: ${result.rows[0].news_for_rating}`;
@@ -118,7 +112,7 @@ const getCompletion = async (req, res) => {
     res.setHeader("Connection", "keep-alive");
     if (res.flushHeaders) res.flushHeaders();
 
-    // 🟢 **Request streaming completion from OpenAI**
+    // Request streaming completion from OpenAI**
     const responseStream = await getOpenAIInstance().chat.completions.create({
       model: "gpt-4o-mini",
       stream: true,
@@ -138,13 +132,13 @@ const getCompletion = async (req, res) => {
         }
       }
     } catch (streamError) {
-      console.error("❌ Error during OpenAI stream:", streamError);
+      console.error(" Error during OpenAI stream:", streamError);
       res.write("\n[Error occurred in AI response]");
     } finally {
       res.end();
     }
   } catch (error) {
-    console.error("❌ Error in getCompletion:", error);
+    console.error(" Error in getCompletion:", error);
     if (!res.headersSent) {
       res.status(500).json({ error: error.message });
     }

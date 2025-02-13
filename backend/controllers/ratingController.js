@@ -11,9 +11,19 @@ const saveRatingSummary = async (req, res) => {
   }
 
   try {
-    const summaryPrompt =
-      'Summarize all the ratings provided so far without asking additional questions. Do not continue the conversation or ask for more ratings. Use the following format for each article:\n\nArtikel: [Title of the article]\nLabel: [Category/Label of the article]\nContent: [Short summary/content of the article]\nBewertung: [Numerical rating and corresponding description]\n\nRespect the rating scale as follows:\n\n1 = überhaupt nicht\n2 = nicht sehr interessiert\n3 = einigermaßen interessiert\n4 = sehr interessiert\n5 = äußerst interessiert\n\nExample Entry:\nArtikel: Belegschaftsversammlung bei Thyssenkrupp: "Die Leute haben geweint"\nLabel: Politik / Wirtschaft (REGIONAL)\nContent: Auf einer Belegschaftsversammlung bei Thyssenkrupp Steel in Bochum wurde es laut. Die Stahlarbeiter sind sauer und enttäuscht.\nBewertung: 4 also sehr interessiert\n\nEnsure all ratings across the conversation are included in this format.';
-
+    const summaryPrompt = `
+      'Generate a list of articles that have been rated only with a 4 or 5. Do not include articles rated below 4. Do not continue the conversation or ask for additional ratings. Present the results using the exact format below:
+Format:
+Artikel: [Title of the article]
+Label: [Category/Label of the article]
+Content: [Short summary/content of the article]
+Bewertung: [Numerical rating and corresponding description]
+Example Entry:
+Artikel: Belegschaftsversammlung bei Thyssenkrupp: "Die Leute haben geweint"
+Label: Politik / Wirtschaft (REGIONAL)
+Content: Auf einer Belegschaftsversammlung bei Thyssenkrupp Steel in Bochum wurde es laut. Die Stahlarbeiter sind sauer und enttäuscht.
+IMPORTANT: Ensure that every article rated 4 or 5 across the conversation is included in this format. If the user has rated 16 articles, all 16 must be listed.
+`;
     const openai = getOpenAIInstance();
 
     const conversation_history = [
@@ -23,6 +33,8 @@ const saveRatingSummary = async (req, res) => {
         content: msg.text,
       })),
     ];
+
+    console.log("Conversation History:", conversation_history);
 
     // Token limit check
     const encoding = get_encoding("cl100k_base");

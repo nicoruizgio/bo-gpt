@@ -21,7 +21,7 @@ const RatingScreen = () => {
       }
 
       console.log("Rating summary saved successfully");
-      navigate("/recommender");
+      navigate("/instruction");
     } catch (error) {
       console.error("Error in handleNext:", error);
       alert("Failed to save rating summary. Please try again.");
@@ -36,7 +36,7 @@ const RatingScreen = () => {
         screenName={"rating_screen"}
         chatLog={chatLog}
         setChatLog={setChatLog}
-        maxMessages={16}
+        maxMessages={5}
         handleNext={handleNext}
         loading={loading}
       />

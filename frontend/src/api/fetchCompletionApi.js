@@ -35,8 +35,6 @@ export async function fetchChatCompletion({
       const { value, done } = await reader.read();
       if (done) break;
 
-      console.log("Received: ", value);
-
       completion += value; // Accumulate received data
 
       if (onUpdate) {

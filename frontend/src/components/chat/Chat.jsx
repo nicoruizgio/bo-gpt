@@ -89,7 +89,7 @@ const Chat = ({
 
   return (
     <section className="chat-area">
-      <HeaderComponent isLoggedIn={true} />
+      <HeaderComponent isLoggedIn={true} screenName={screenName} />
       <div className="chat-log">
         <ChatMessage chatLog={chatLog} />
       </div>

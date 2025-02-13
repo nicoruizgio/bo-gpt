@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../api/logoutApi";
 import "./HeaderComponent.css";
 
-const HeaderComponent = ({ isLoggedIn }) => {
+const HeaderComponent = ({ isLoggedIn, screenName }) => {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
 
@@ -39,7 +39,14 @@ const HeaderComponent = ({ isLoggedIn }) => {
         </div>
       )}
 
-      <h2 className="header-title">Bo-GPT</h2>
+      <div className="header-title">
+        <h2>Bo-GPT</h2>
+        {screenName === "rating_screen" ? (
+          <h3 className="sub-title">Rating</h3>
+        ) : screenName === "recommender_screen" ? (
+          <h3 className="sub-title">News Recommender</h3>
+        ) : null}
+      </div>
     </header>
   );
 };

@@ -11,6 +11,7 @@ import LogInScreen from "./screens/log-in-screen/LogInScreen";
 import SignUpScreen from "./screens/sign-up-screen/SingUpScreen";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import Instruction from "./screens/instruction-screen/InstructionScreen";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/introduction" element={<Introduction />} />
           <Route path="/rating" element={<RatingScreen />} />
+          <Route path="/instruction" element={<Instruction />} />
           <Route path="/recommender" element={<RecommenderScreen />} />
         </Route>
 

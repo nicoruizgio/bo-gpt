@@ -6,6 +6,7 @@
   position: relative;
   width: 100%;
   padding-left: 1rem;
+  padding-bottom: 1rem;
 }
 .header-component p {
   font-size: 0.7rem;
@@ -45,4 +46,8 @@
   display: flex;
   flex-direction: row;
   gap: 0rem;
+}
+
+.sub-title {
+  font-size: 0.8rem;
 }
