@@ -11,7 +11,7 @@ const saveRatingSummary = async (req, res) => {
   }
 
   try {
-    const summaryPrompt = `
+    const prompt = `
       'Generate a list of articles that have been rated only with a 4 or 5. Do not include articles rated below 4. Do not continue the conversation or ask for additional ratings. Present the results using the exact format below:
 Format:
 Artikel: [Title of the article]
@@ -26,8 +26,8 @@ IMPORTANT: Ensure that every article rated 4 or 5 across the conversation is inc
 `;
     const openai = getOpenAIInstance();
 
+    /*
     const conversation_history = [
-      { role: "system", content: summaryPrompt },
       ...chatLog.map((msg) => ({
         role: msg.role === "ai" ? "assistant" : "user",
         content: msg.text,
@@ -35,22 +35,23 @@ IMPORTANT: Ensure that every article rated 4 or 5 across the conversation is inc
     ];
 
     console.log("Conversation History:", conversation_history);
+    */
 
-    // Token limit check
-    const encoding = get_encoding("cl100k_base");
-    const tokens = encoding.encode(
-      conversation_history.map((msg) => msg.content).join("\n")
-    ).length;
-    encoding.free();
+    const conversation = chatLog
+  .map(msg => `${msg.role === "ai" ? "assistant" : "user"}: ${msg.text}`)
+  .join("\n");
 
-    console.log(`Total Tokens: ${tokens}`);
+    console.log('Conversation:', conversation);
 
     // 🆕 Generate summary from OpenAI
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: conversation_history,
-      max_tokens: 500,
+      messages: [
+        {role: 'system', content: prompt},
+        {role: 'user', content: conversation}
+      ]
     });
+
 
     const summaryText = response.choices[0]?.message?.content?.trim();
     if (!summaryText) {

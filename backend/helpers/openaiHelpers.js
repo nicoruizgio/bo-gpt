@@ -2,6 +2,10 @@ const { getOpenAIInstance } = require("../config/openai");
 const { get_encoding } = require("tiktoken");
 const pool = require("../config/db");
 
+function getCurrentTimestamp() {
+  return Date.now()
+}
+
 async function getParamsFromDb(screenName) {
   const result = await pool.query(
     "SELECT system_prompt, news_for_rating FROM chat_contexts WHERE screen_name = $1",
@@ -62,7 +66,7 @@ function updatePrompt({
   newsForRating,
 }) {
   if (screenName === "recommender_screen") {
-    return `${baseSystemPrompt}\n\nSelected Articles:\n${context}`;
+    return `${baseSystemPrompt}\n\n Today's date: ${getCurrentTimestamp()} \n\nSelected Articles:\n${context}`;
   } else if (screenName === "rating_screen") {
     return `${baseSystemPrompt}\n\nNews for Rating: ${newsForRating}`;
   }

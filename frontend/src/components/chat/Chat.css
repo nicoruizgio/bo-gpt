@@ -104,3 +104,7 @@ h1 {
   cursor: pointer;
   margin: auto 1rem;
 }
+
+.button.send-message.disabled {
+  background-color: #888;
+}

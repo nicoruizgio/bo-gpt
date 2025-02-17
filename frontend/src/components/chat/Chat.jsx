@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
+import{  useState } from "react";
 import ChatMessage from "./chat-message/ChatMessage";
 import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import "./Chat.css";
@@ -15,13 +16,20 @@ const Chat = ({
 }) => {
   const [message, setMessage] = useState("");
   const [userMessageCount, setUserMessageCount] = useState(0);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   async function handleSubmit() {
     if (message.trim() === "") return;
     if (maxMessages && userMessageCount >= maxMessages) return;
 
     const userMessage = { id: Date.now(), role: "user", text: message };
-    const updatedChatLog = [...chatLog, userMessage];
+    // Add both the user message and the AI placeholder to the chat log
+    const updatedChatLog = [
+      ...chatLog,
+      userMessage,
+      { id: "ai-stream", role: "ai", text: "" }
+    ];
     setChatLog(updatedChatLog);
 
     const parsedMessage = parseInt(message, 10);
@@ -43,27 +51,27 @@ const Chat = ({
     }
 
     try {
+      setIsFetching(true);
+      setIsDisabled(true);
       let currentText = "";
       const aiResponse = await fetchChatCompletion({
         chatLog: updatedChatLog,
         screenName,
         onUpdate: (partial) => {
           currentText = partial;
-          // Optionally update a temporary "streaming" message in your UI
+          // Update only the streaming AI placeholder message:
           setChatLog((prevChatLog) => {
-            const aiMessage = {
-              id: "ai-stream",
-              role: "ai",
-              text: currentText,
-            };
-            // Remove previous streaming message (if exists) and add new one
             const newLog = prevChatLog.filter((msg) => msg.id !== "ai-stream");
-            return [...newLog, aiMessage];
+            return [
+              ...newLog,
+              { id: "ai-stream", role: "ai", text: currentText }
+            ];
           });
         },
       });
-
-      // Once complete, update with the final text
+      setIsFetching(false);
+      setIsDisabled(false);
+      // Replace the streaming placeholder with the final AI message
       setChatLog((prevChatLog) => [
         ...prevChatLog.filter((msg) => msg.id !== "ai-stream"),
         { id: Date.now(), role: "ai", text: aiResponse },
@@ -80,6 +88,7 @@ const Chat = ({
     }
   }
 
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -91,7 +100,7 @@ const Chat = ({
     <section className="chat-area">
       <HeaderComponent isLoggedIn={true} screenName={screenName} />
       <div className="chat-log">
-        <ChatMessage chatLog={chatLog} />
+        <ChatMessage chatLog={chatLog} isFetching={isFetching} />
       </div>
       <div className="bottom-section">
         {maxMessages && userMessageCount >= maxMessages ? (
@@ -106,8 +115,9 @@ const Chat = ({
               onKeyDown={handleKeyPress}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              disabled={isDisabled}
             ></textarea>
-            <div className="button send-message">Send</div>
+            <div className={isDisabled ? "button send-message disabled":"button send-message"} disabled={isDisabled} onClick={handleSubmit}>Send</div>
           </div>
         )}
       </div>

@@ -26,7 +26,7 @@ const getCompletion = async (req, res) => {
       const articleSqlQuery = `
         SELECT id, title, summary, link, published_unix
         FROM rss_embeddings
-        ORDER BY embedding <-> $1 LIMIT 10;
+        ORDER BY embedding <-> $1 LIMIT 5;
       `;
       const userSqlQuery =
         "SELECT summary FROM ratings WHERE participant_id = $1 ORDER BY created_at DESC LIMIT 1";
@@ -66,6 +66,7 @@ const getCompletion = async (req, res) => {
         baseSystemPrompt,
         context,
       });
+      console.log(updatedSystemPrompt);
     } else if (screenName === "rating_screen") {
       // Destructure to get both baseSystemPrompt and newsForRating from the database
       const { baseSystemPrompt, newsForRating } = await getParamsFromDb(

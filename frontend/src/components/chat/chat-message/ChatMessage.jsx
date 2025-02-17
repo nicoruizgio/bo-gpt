@@ -1,21 +1,24 @@
 import React from "react";
 import "./ChatMessage.css";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm"; // Supports GitHub-flavored Markdown (tables, links)
-import rehypeRaw from "rehype-raw"; // Allows rendering raw HTML
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import Spinner from "../../Spinner";
 
 const ChatMessage = ({ chatLog }) => {
   return (
     <>
       {chatLog.map((message) => (
         <div key={message.id} className={`chat-item ${message.role}`}>
-          {message.role === "ai" && ( // If role is AI, then display AI avatar
+          {message.role === "ai" && (
             <span className="material-symbols-outlined ai-avatar">
               smart_toy
             </span>
           )}
           <div className="chat-item-message-content">
-            {message.role === "ai" ? (
+            {message.id === "ai-stream" && message.text.trim() === "" ? (
+              <Spinner />
+            ) : message.role === "ai" ? (
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}

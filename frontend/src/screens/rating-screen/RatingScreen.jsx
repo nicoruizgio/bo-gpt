@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RatingScreen.css";
 import Chat from "../../components/chat/Chat";
-import config from "../../config/config_rating.json";
-import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import { storeRatingSummary } from "../../api/storeRatingsApi";
 
 const RatingScreen = () => {
