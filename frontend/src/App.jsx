@@ -13,9 +13,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import Instruction from "./screens/instruction-screen/InstructionScreen";
 
+
 function App() {
   return (
     <Router>
+
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicRoute />}>

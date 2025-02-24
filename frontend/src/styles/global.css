@@ -15,7 +15,8 @@ body {
 
 a {
   text-decoration: none;
-  color: var(--font-color);
+  color: var(--blue);
+  target: "_blank";
 }
 
 .screen-container {

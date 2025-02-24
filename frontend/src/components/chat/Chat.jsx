@@ -24,7 +24,7 @@ const Chat = ({
     if (maxMessages && userMessageCount >= maxMessages) return;
 
     const userMessage = { id: Date.now(), role: "user", text: message };
-    // Add both the user message and the AI placeholder to the chat log
+
     const updatedChatLog = [
       ...chatLog,
       userMessage,
@@ -32,10 +32,12 @@ const Chat = ({
     ];
     setChatLog(updatedChatLog);
 
+
     const parsedMessage = parseInt(message, 10);
+
     const isValidRating = [1, 2, 3, 4, 5].includes(parsedMessage);
 
-    // Use a local variable to track the new count
+
     let newCount = userMessageCount;
     if (maxMessages && isValidRating) {
       newCount = userMessageCount + 1;
@@ -46,6 +48,8 @@ const Chat = ({
 
     // Only stop fetching AI response if the valid message limit is reached.
     if (maxMessages && isValidRating && newCount >= maxMessages) {
+      setIsFetching(false)
+
       console.log("User has reached the message limit", newCount);
       return;
     }
@@ -59,7 +63,6 @@ const Chat = ({
         screenName,
         onUpdate: (partial) => {
           currentText = partial;
-          // Update only the streaming AI placeholder message:
           setChatLog((prevChatLog) => {
             const newLog = prevChatLog.filter((msg) => msg.id !== "ai-stream");
             return [
@@ -71,7 +74,6 @@ const Chat = ({
       });
       setIsFetching(false);
       setIsDisabled(false);
-      // Replace the streaming placeholder with the final AI message
       setChatLog((prevChatLog) => [
         ...prevChatLog.filter((msg) => msg.id !== "ai-stream"),
         { id: Date.now(), role: "ai", text: aiResponse },

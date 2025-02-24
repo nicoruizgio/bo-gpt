@@ -16,6 +16,7 @@ const getCompletion = async (req, res) => {
     const userId = req.user.id;
 
     console.log("Screen Name:", JSON.stringify(screenName));
+    console.log("CHAT LOG: ", chatLog)
     if (!screenName || !chatLog) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
@@ -31,22 +32,11 @@ const getCompletion = async (req, res) => {
       const userSqlQuery =
         "SELECT summary FROM ratings WHERE participant_id = $1 ORDER BY created_at DESC LIMIT 1";
 
-      // Destructure to get the base system prompt
       const { baseSystemPrompt } = await getParamsFromDb(screenName);
-
-      // Get the latest user message
-      const userMessage = chatLog[chatLog.length - 1].text;
-
-      // Fetch user preferences (returns the summary string)
+      const userMessage = chatLog.filter((msg) => msg.role === 'user').pop()?.text || null
       const userPreferences = await getUserPreferences(userSqlQuery, userId);
-
-      // Generate embeddings for both the user message and user preferences
-      console.log("User Message:", userMessage);
-      console.log("User Preferences:", userPreferences);
       const userMessageEmbedding = await generateEmbedding(userMessage);
       const userPreferencesEmbedding = await generateEmbedding(userPreferences);
-
-      // Perform vector searches based on the embeddings
       const userMessageArticles = await vectorSearch(
         userMessageEmbedding,
         articleSqlQuery
@@ -55,20 +45,16 @@ const getCompletion = async (req, res) => {
         userPreferencesEmbedding,
         articleSqlQuery
       );
-
-      // Create the context by combining the results
-      const context = `${userMessageArticles}\n\n${userPreferencesArticles}`;
-      console.log("Context:", context);
-
-      // Update the system prompt
+      const context = `***Articles relevent for user query:*** \n ${userMessageArticles}\n\n ***Articles similar to user preferences***: \n${userPreferencesArticles}`;
+      // console.log(context);
       updatedSystemPrompt = updatePrompt({
         screenName,
         baseSystemPrompt,
         context,
       });
-      console.log(updatedSystemPrompt);
-    } else if (screenName === "rating_screen") {
-      // Destructure to get both baseSystemPrompt and newsForRating from the database
+       console.log(updatedSystemPrompt);
+    }
+    else if (screenName === "rating_screen") {
       const { baseSystemPrompt, newsForRating } = await getParamsFromDb(
         screenName
       );
@@ -85,6 +71,8 @@ const getCompletion = async (req, res) => {
       chatLog,
       updatedSystemPrompt
     );
+
+    //console.log(conversation_history)
 
     // Calculate and log token count
     const tokens = calculateTokenCount(conversation_history);

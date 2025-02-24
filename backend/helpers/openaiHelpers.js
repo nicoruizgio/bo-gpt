@@ -35,6 +35,7 @@ async function getUserPreferences(sqlQuery, userId) {
 }
 
 async function generateEmbedding(text) {
+  console.log('TEXT TO EMBEDDING: ', text)
   const openai = getOpenAIInstance();
   const embeddingResponse = await openai.embeddings.create({
     model: "text-embedding-ada-002",
@@ -100,7 +101,6 @@ async function streamChatCompletion(conversation_history, res) {
     model: "gpt-4o-mini",
     stream: true,
     messages: conversation_history,
-    max_tokens: 5000,
   });
 
   try {
