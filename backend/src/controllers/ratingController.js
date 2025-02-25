@@ -12,17 +12,22 @@ const saveRatingSummary = async (req, res) => {
 
   try {
     const prompt = `
-      'Generate a list of articles that have been rated only with a 4 or 5. Do not include articles rated below 4. Do not continue the conversation or ask for additional ratings. Present the results using the exact format below:
-Format:
-Artikel: [Title of the article]
-Label: [Category/Label of the article]
-Content: [Short summary/content of the article]
-Bewertung: [Numerical rating and corresponding description]
-Example Entry:
-Artikel: Belegschaftsversammlung bei Thyssenkrupp: "Die Leute haben geweint"
-Label: Politik / Wirtschaft (REGIONAL)
-Content: Auf einer Belegschaftsversammlung bei Thyssenkrupp Steel in Bochum wurde es laut. Die Stahlarbeiter sind sauer und enttäuscht.
-IMPORTANT: Ensure that every article rated 4 or 5 across the conversation is included in this format. If the user has rated 16 articles, all 16 must be listed.
+      Role:
+You are an intelligent assistant specializing in information retrieval and recommendation systems. Your task is to generate a concise similarity search query based on a list of articles that a user has rated between 1 and 5.
+
+Task:
+
+You will receive a list of articles, each accompanied by a user rating from 1 to 5.
+Your job is to generate a concise search query that retrieves articles similar to those rated 4 and 5.
+The query should capture key themes, topics, and relevant metadata (e.g., keywords, concepts) of the highly-rated articles to ensure effective similarity-based search.
+Requirements for the search query:
+
+Focus on top-rated articles: Only consider articles rated 4 or 5 when generating the query.
+Extract key topics: Identify the most important themes, keywords, or phrases from these articles.
+Concise output: The query should be short but effective, optimizing relevance in a similarity-based search.
+Generalizable format: The query should be suitable for vector-based search, keyword-based search, or hybrid retrieval methods.
+Ignore low-rated content: Do not incorporate articles rated 3 or below in the query formulation.
+Generate the query in English.
 `;
     const openai = getOpenAIInstance();
 
@@ -43,7 +48,7 @@ IMPORTANT: Ensure that every article rated 4 or 5 across the conversation is inc
 
     console.log('Conversation:', conversation);
 
-    // 🆕 Generate summary from OpenAI
+    // Generate summary from OpenAI
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -60,7 +65,7 @@ IMPORTANT: Ensure that every article rated 4 or 5 across the conversation is inc
 
     console.log("Generated Summary:", summaryText);
 
-    // 🆕 Check if the participant already has a rating
+    // Check if the participant already has a rating
     const existingRating = await pool.query(
       "SELECT * FROM ratings WHERE participant_id = $1",
       [participantId]
