@@ -12,6 +12,7 @@ import SignUpScreen from "./screens/sign-up-screen/SingUpScreen";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import Instruction from "./screens/instruction-screen/InstructionScreen";
+import Questionnaire from "./screens/questionnaire-screen/QuestionnaireScreen";
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
+          <Route path="/questionnaire" element={<Questionnaire/>} />
           <Route path="/introduction" element={<Introduction />} />
           <Route path="/rating" element={<RatingScreen />} />
           <Route path="/instruction" element={<Instruction />} />
