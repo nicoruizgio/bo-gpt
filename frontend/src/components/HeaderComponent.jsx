@@ -1,9 +1,9 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../api/logoutApi";
 import "./HeaderComponent.css";
 
-const HeaderComponent = ({ isLoggedIn, screenName }) => {
+const HeaderComponent = ({ isLoggedIn, screenName, setChatLog, setConversationId}) => {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
 
@@ -22,6 +22,13 @@ const HeaderComponent = ({ isLoggedIn, screenName }) => {
     }
   };
 
+  const handleNewChat = () => {
+    setConversationId(null);
+    setChatLog([
+
+    ])
+  }
+
   return (
     <header className="header-component">
       {isLoggedIn && (
@@ -36,7 +43,9 @@ const HeaderComponent = ({ isLoggedIn, screenName }) => {
             <span className="material-symbols-outlined user">person</span>
             <p className="username">{username}</p>
           </div>
+
         </div>
+
       )}
 
       <div className="header-title">
@@ -47,6 +56,15 @@ const HeaderComponent = ({ isLoggedIn, screenName }) => {
           <h3 className="sub-title">News Recommender</h3>
         ) : null}
       </div>
+      {
+        isLoggedIn && screenName == 'recommender_screen' ? (
+          <div className="new-chat">
+            <button className="button new-chat-btn" onClick={handleNewChat}>
+              + New Chat
+              </button>
+          </div>
+        ) : null
+      }
     </header>
   );
 };

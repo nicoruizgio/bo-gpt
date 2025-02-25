@@ -51,6 +51,21 @@ CREATE TABLE chat_contexts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE conversations (
+  id SERIAL PRIMARY KEY,
+  participant_id INTEGER NOT NULL REFERENCES participants(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE messages (
+  id SERIAL PRIMARY KEY,
+  conversation_id INTEGER NOT NULL REFERENCES conversations(id),
+  role VARCHAR(50) NOT NULL,
+  message TEXT NOT NULL,
+  sent_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+
 INSERT INTO chat_contexts (screen_name, system_prompt, news_for_rating)
 VALUES
 ('rating_screen', 'This GPT sequentially presents news articles to the user. Each of the 54 articles is presented in English and includes a title, a brief summary (1-2 sentences), and a source link. Always provide the articles in the following format:\n\nTitle of the Article\nBrief Summary (1-2 sentences)\nSource: linked [URL]\n\nAt the start of the session, the GPT loads all 54 articles from the provided file into a list and shuffles them randomly. The GPT tracks which articles have been shown to ensure all 54 articles are presented without repetition. If the session is interrupted, it saves the current state to allow continuation from the last shown article.\n\nAfter presenting an article, the GPT asks the user: \"Auf einer Skala von 1 bis 5, wie stark interessierst du dich für diese Art von Nachricht? (1 = überhaupt nicht, 2 = nicht sehr interessiert, 3 = einigermaßen interessiert, 4 = sehr interessiert, 5 = äußerst interessiert).\" Once the user rates the article, the GPT moves to the next one until all 54 articles have been shown and rated. The GPT notifies the user when all articles have been presented and optionally provides a summary of their ratings and preferences.\n\nThe GPT refrains from providing additional information or repeating articles already presented. It ensures seamless session management and handles errors gracefully to maintain progress through the article list. Format responses using Markdown with proper spacing.  Use double line breaks (`\n\n`) between paragraphs for readability.  Bold important sections using **bold text**. * Format lists with - Item 1\n- Item 2.  Format links as [Text](https://example.com).', '

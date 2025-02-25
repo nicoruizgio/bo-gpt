@@ -5,6 +5,7 @@ import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import "./Chat.css";
 import HeaderComponent from "../HeaderComponent";
 import Spinner from "../Spinner";
+import {createConversation} from "../../api/conversationApi";
 
 const Chat = ({
   screenName,
@@ -13,6 +14,8 @@ const Chat = ({
   maxMessages,
   handleNext,
   loading,
+  conversationId,
+  setConversationId
 }) => {
   const [message, setMessage] = useState("");
   const [userMessageCount, setUserMessageCount] = useState(0);
@@ -22,6 +25,15 @@ const Chat = ({
   async function handleSubmit() {
     if (message.trim() === "") return;
     if (maxMessages && userMessageCount >= maxMessages) return;
+
+    if(!conversationId) {
+      try {
+        const conversation = await createConversation();
+        setConversationId(conversation.id);
+      } catch (error) {
+      console.error("Error creating conversation", error);
+
+      }}
 
     const userMessage = { id: Date.now(), role: "user", text: message };
 
@@ -100,7 +112,7 @@ const Chat = ({
 
   return (
     <section className="chat-area">
-      <HeaderComponent isLoggedIn={true} screenName={screenName} />
+      <HeaderComponent isLoggedIn={true} screenName={screenName} setChatLog={setChatLog} setConversationId={setConversationId} />
       <div className="chat-log">
         <ChatMessage chatLog={chatLog} isFetching={isFetching} />
       </div>
