@@ -17,6 +17,18 @@ CREATE TABLE ratings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE questionnaire_responses (
+  id SERIAL PRIMARY KEY,
+  age INTEGER,
+  gender VARCHAR(255),
+  location VARCHAR(20),
+  news_consumption_frequency VARCHAR(255),
+  education VARCHAR(255),
+  _id INTEGER NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+
 
 CREATE TABLE news_articles_flexible (
     id SERIAL PRIMARY KEY,

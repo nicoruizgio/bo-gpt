@@ -20,7 +20,7 @@ const PublicRoute = () => {
     return <div>Loading...</div>; // Or show a spinner, depending on your preference
   }
 
-  return authenticated ? <Navigate to="/introduction" /> : <Outlet />;
+  return authenticated ? <Navigate to="/questionnaire" /> : <Outlet />;
 };
 
 export default PublicRoute;

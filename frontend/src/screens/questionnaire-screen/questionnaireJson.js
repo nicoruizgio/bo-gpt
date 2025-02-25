@@ -3,14 +3,14 @@ const questionnaireJson = {
   elements: [
     {
       "type": "text",
-      "name": "question1",
+      "name": "age",
       "title": "Wie alt bist du?",
       "description": "Geben Sie Ihr Alter in Zahlen ein (z. B. \"23\")",
       "inputType": "number"
     },
     {
       "type": "radiogroup",
-      "name": "question2",
+      "name": "gender",
       "title": "Mit welchem Geschlecht identifizierst du dich?",
       "description": "Hinweis: Wir fragen dies, weil wir sicherstellen möchten, dass wir Menschen mit verschiedenen Geschlechtsidentitäten einbeziehen.",
       "choices": [
@@ -32,13 +32,14 @@ const questionnaireJson = {
     },
     {
       "type": "text",
-      "name": "question3",
+      "name": "location",
       "title": "Wie lautet die Postleitzahl deines Wohnortes?",
-      "description": "Hinweis: Wir fragen dies, weil wir sicherstellen möchten, dass wir Menschen aus Bochum und Umgebung einbeziehen."
+      "description": "Hinweis: Wir fragen dies, weil wir sicherstellen möchten, dass wir Menschen aus Bochum und Umgebung einbeziehen.",
+      "inputType": "number"
     },
     {
       "type": "radiogroup",
-      "name": "question4",
+      "name": "newsConsumptionFrequency",
       "title": "Wie oft siehst, hörst, liest oder redest du normalerweise über Nachrichten aus Bochum und Umgebung?",
       "description": "Es geht hier ausdrücklich um deine persönliche Meinung, jeder und jede hat andere Interessen.",
       "choices": [
@@ -86,8 +87,8 @@ const questionnaireJson = {
     },
     {
       "type": "radiogroup",
-      "name": "question5",
-      "title": "Welchen Abschluss hast du? ",
+      "name": "education",
+      "title": "Welchen Abschluss hast du?",
       "description": "Wenn du derzeit in der Ausbildung bist, gib bitte den höchsten Abschluss an, den du bisher erreicht hast. Warum wir das fragen? Wir möchten sicherstellen, dass wir Menschen mit unterschiedlichen Bildungshintergründen einbeziehen.",
       "choices": [
         {
