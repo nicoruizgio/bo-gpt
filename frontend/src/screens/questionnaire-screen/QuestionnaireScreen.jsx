@@ -15,6 +15,21 @@ const Questionnaire = () => {
   questionnaire.onComplete.add(async (survey, options) => {
     options.showSaveInProgress();
     const surveyResult = survey.data;
+
+    const defaults = {
+      age: 99,
+      gender: "99",
+      location: 99,
+      newsConsumptionFrequency: "99",
+    education: "99"
+    }
+
+    Object.keys(defaults).forEach(key =>{
+      if (surveyResult[key] == undefined || surveyResult[key] == "") {
+        surveyResult[key] = defaults[key];
+      }
+    });
+
     console.log("survey results: ", surveyResult)
 
     try {

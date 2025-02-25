@@ -5,7 +5,7 @@ import Chat from "../../components/chat/Chat";
 import { storeRatingSummary } from "../../api/storeRatingsApi";
 
 const RatingScreen = () => {
-  const [chatLog, setChatLog] = useState([]);
+  const [chatLog, setChatLog] = useState([{id: 'ai-stream', role: "ai", text: "Hi, I'm Bo-GPT and I'll be presenting 36 news articles for you to rate from 1 to 5. Are you ready?"}]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
