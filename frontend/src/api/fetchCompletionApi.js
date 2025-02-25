@@ -3,8 +3,9 @@ import { API_URL } from "./apiurl";
 export async function fetchChatCompletion({
   chatLog,
   screenName,
+  conversationId,
   onUpdate, // Callback function to update UI in real-time
-  summatyMode = false,
+  summaryMode = false,
 }) {
   try {
     const response = await fetch(`${API_URL}/api/completion`, {
@@ -15,7 +16,8 @@ export async function fetchChatCompletion({
       body: JSON.stringify({
         chatLog,
         screenName,
-        summatyMode,
+        conversationId,
+        summaryMode,
       }),
       credentials: "include",
     });

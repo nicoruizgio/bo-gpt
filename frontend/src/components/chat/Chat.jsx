@@ -26,9 +26,11 @@ const Chat = ({
     if (message.trim() === "") return;
     if (maxMessages && userMessageCount >= maxMessages) return;
 
-    if(!conversationId) {
+    let currentConversationId = conversationId;
+    if(!currentConversationId) {
       try {
         const conversation = await createConversation();
+        currentConversationId = conversation.id
         setConversationId(conversation.id);
       } catch (error) {
       console.error("Error creating conversation", error);
@@ -73,6 +75,7 @@ const Chat = ({
       const aiResponse = await fetchChatCompletion({
         chatLog: updatedChatLog,
         screenName,
+        conversationId: currentConversationId,
         onUpdate: (partial) => {
           currentText = partial;
           setChatLog((prevChatLog) => {

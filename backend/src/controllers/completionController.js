@@ -8,11 +8,12 @@ const {
   createConversationHistory,
   calculateTokenCount,
   streamChatCompletion,
+  saveMessage,
 } = require("../helpers/openaiHelpers");
 
 const getCompletion = async (req, res) => {
   try {
-    const { chatLog, screenName } = req.body;
+    const { chatLog, screenName, conversationId } = req.body;
     const userId = req.user.id;
 
     console.log("Screen Name:", JSON.stringify(screenName));
@@ -24,6 +25,10 @@ const getCompletion = async (req, res) => {
     let updatedSystemPrompt;
 
     if (screenName === "recommender_screen") {
+      const userMsg = chatLog.filter((msg) => msg.role === 'user').pop();
+      if (userMsg) {
+        await saveMessage(conversationId, userMsg.role, userMsg.text);
+        }
       const articleSqlQuery = `
         SELECT id, title, summary, link, published_unix
         FROM rss_embeddings
@@ -84,8 +89,22 @@ const getCompletion = async (req, res) => {
     res.setHeader("Connection", "keep-alive");
     if (res.flushHeaders) res.flushHeaders();
 
+    let finalAiMessage = "";
     // Stream the response from OpenAI to the client
-    await streamChatCompletion(conversation_history, res);
+    await streamChatCompletion(conversation_history, res, {
+      onUpdate: (partial) => {
+        finalAiMessage += partial;
+        setChatLog((prevChatLog) => {
+          const newLog = prevChatLog.filter((msg) => msg.id !== "ai-stream");
+          return [
+            ...newLog,
+            { id: "ai-stream", role: "ai", text: finalAiMessage }
+          ];
+        });
+      }
+    });
+    console.log("Final AI message:", finalAiMessage);
+    await saveMessage(conversationId, "ai", finalAiMessage)
   } catch (error) {
     console.error("Error in getCompletion:", error);
     if (!res.headersSent) {

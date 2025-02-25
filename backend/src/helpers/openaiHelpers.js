@@ -122,6 +122,19 @@ async function streamChatCompletion(conversation_history, res) {
   }
 }
 
+async function saveMessage (conversationId, role, message)  {
+  if (!conversationId) {
+    throw new Error("CONVERSATION ID is required")
+  }
+  const query = `
+    INSERT INTO messages (conversation_id, role, message)
+    VALUES ($1,$2,$3)
+    RETURNING id;
+  `
+  const result = await pool.query(query, [conversationId, role, message]);
+  return result.rows[0].id;
+}
+
 module.exports = {
   getParamsFromDb,
   getUserPreferences,
@@ -131,4 +144,5 @@ module.exports = {
   createConversationHistory,
   calculateTokenCount,
   streamChatCompletion,
+  saveMessage
 };
