@@ -95,7 +95,7 @@ function calculateTokenCount(conversation_history) {
   return tokens;
 }
 
-async function streamChatCompletion(conversation_history, res) {
+async function streamChatCompletion(conversation_history, res, { onUpdate } = {}) {
   const openai = getOpenAIInstance();
   const responseStream = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -111,6 +111,7 @@ async function streamChatCompletion(conversation_history, res) {
       const text = chunk.choices[0].delta?.content;
       if (text) {
         res.write(text);
+        if (onUpdate) onUpdate(text);
         if (res.flush) res.flush();
       }
     }
@@ -121,6 +122,7 @@ async function streamChatCompletion(conversation_history, res) {
     res.end();
   }
 }
+
 
 async function saveMessage (conversationId, role, message)  {
   if (!conversationId) {

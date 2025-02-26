@@ -94,17 +94,11 @@ const getCompletion = async (req, res) => {
     await streamChatCompletion(conversation_history, res, {
       onUpdate: (partial) => {
         finalAiMessage += partial;
-        setChatLog((prevChatLog) => {
-          const newLog = prevChatLog.filter((msg) => msg.id !== "ai-stream");
-          return [
-            ...newLog,
-            { id: "ai-stream", role: "ai", text: finalAiMessage }
-          ];
-        });
       }
     });
     console.log("Final AI message:", finalAiMessage);
-    await saveMessage(conversationId, "ai", finalAiMessage)
+    await saveMessage(conversationId, "ai", finalAiMessage);
+
   } catch (error) {
     console.error("Error in getCompletion:", error);
     if (!res.headersSent) {
