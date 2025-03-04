@@ -33,7 +33,7 @@ const LogInScreen = () => {
     try {
       const data = await loginUser(credentials.username, credentials.password); // Capture the returned data
 
-      navigate("/introduction"); // Redirect after successful login
+      navigate("/questionnaire"); // Redirect after successful login
     } catch (err) {
       setError(err.message);
     }

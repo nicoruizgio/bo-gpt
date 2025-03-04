@@ -6,6 +6,7 @@ import "./Chat.css";
 import HeaderComponent from "../HeaderComponent";
 import Spinner from "../Spinner";
 import {createConversation} from "../../api/conversationApi";
+import { saveMessage } from "../../api/saveMessageApi";
 
 const Chat = ({
   screenName,
@@ -24,7 +25,7 @@ const Chat = ({
 
   async function handleSubmit() {
     if (message.trim() === "") return;
-    if (maxMessages && userMessageCount >= maxMessages) return;
+    //if (maxMessages && userMessageCount >= maxMessages) return;
 
     let currentConversationId = conversationId;
     if(!currentConversationId) {
@@ -45,6 +46,12 @@ const Chat = ({
       { id: "ai-stream", role: "ai", text: "" }
     ];
     setChatLog(updatedChatLog);
+
+    try {
+      await saveMessage(currentConversationId, "user", message);
+    } catch (error) {
+      console.error("Error saving user message: ", error);
+    }
 
 
     const parsedMessage = parseInt(message, 10);

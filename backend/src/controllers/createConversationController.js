@@ -1,5 +1,6 @@
 const pool = require("../config/db")
 
+/* Insert new conversation record in DB */
 const createConversation = async (req, res) => {
   try {
     const userId = req.user && req.user.id;

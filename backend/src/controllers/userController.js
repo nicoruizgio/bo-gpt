@@ -2,6 +2,9 @@ const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+/* Logic for user registration, log in and log out*/
+
+// Registration
 const registerUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -40,6 +43,8 @@ const registerUser = async (req, res) => {
   }
 };
 
+
+//Log in
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -85,6 +90,8 @@ const loginUser = async (req, res) => {
   }
 };
 
+
+// Log out
 const logoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true, // Ensure the cookie is cleared properly

@@ -1,9 +1,33 @@
-import  { useState } from "react";
+
+import { useEffect } from "react";
 import Chat from "../../components/chat/Chat";
+import { usePersistedState } from "../../hooks/usePersistedState";
 
 const RecommenderScreen = () => {
-  const [chatLog, setChatLog] = useState([{id: 'ai-stream', role: "ai", text: "Hello! I'm here to provide you with the latest news about Bochum, Germany. How can I assist you today?"}]);
-  const [conversationId, setConversationId] = useState(null);
+  const [chatLog, setChatLog] = usePersistedState(
+    "recommenderChatLog",
+    [
+      {
+        id: "ai-stream",
+        role: "ai",
+        text: "Hello! I'm here to provide you with the latest news about Bochum, Germany. How can I assist you today?"
+      }
+    ],
+    true
+  );
+  const [conversationId, setConversationId] = usePersistedState(
+    "recommenderConversationId",
+    null,
+    true
+  );
+
+  // On unmount (i.e. when navigating away), clear the sessionStorage keys.
+  useEffect(() => {
+    return () => {
+      sessionStorage.removeItem("recommenderChatLog");
+      sessionStorage.removeItem("recommenderConversationId");
+    };
+  }, []);
 
   return (
     <div className="chat-screen">

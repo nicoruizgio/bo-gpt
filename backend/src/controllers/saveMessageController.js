@@ -1,5 +1,6 @@
 const { saveMessage } = require("../helpers/openaiHelpers")
 
+/* Insert new message record in DB*/
 const saveMessageController = async (req, res) => {
   try {
     const { conversationId, role, text} = req.body;

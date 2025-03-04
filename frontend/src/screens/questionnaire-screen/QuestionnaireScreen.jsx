@@ -12,8 +12,10 @@ const Questionnaire = () => {
   const questionnaire = new Model(questionnaireJson);
   questionnaire.applyTheme(styles);
 
+  questionnaire.completedHtml = ""
+
   questionnaire.onComplete.add(async (survey, options) => {
-    options.showSaveInProgress();
+    //options.showSaveInProgress();
     const surveyResult = survey.data;
 
     const defaults = {
@@ -34,7 +36,7 @@ const Questionnaire = () => {
 
     try {
       await saveQuestionnaireResults(surveyResult);
-      options.showSaveSuccess();
+      //options.showSaveSuccess();
       navigate("/introduction")
     } catch (error) {
       options.showSaveError('Error saving results');

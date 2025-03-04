@@ -17,6 +17,7 @@ CREATE TABLE ratings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create questionnaire table
 CREATE TABLE questionnaire_responses (
   id SERIAL PRIMARY KEY,
   participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
@@ -42,7 +43,7 @@ CREATE TABLE news_articles_flexible (
     embedding VECTOR(1536)
 );
 
-
+-- Create chat context (list of news articles to rate and base prompt for rating and recommender screens)
 CREATE TABLE chat_contexts (
     id SERIAL PRIMARY KEY,
     screen_name VARCHAR(255) UNIQUE NOT NULL,
@@ -51,12 +52,14 @@ CREATE TABLE chat_contexts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create conversations table
 CREATE TABLE conversations (
   id SERIAL PRIMARY KEY,
   participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create message table
 CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
   conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
@@ -285,49 +288,9 @@ Maintain a neutral, factual, and professional tone.
 If a user inquires about the chatbot’s capabilities (e.g., "Was kann ich hier machen?"), explain that it is a localized news assistant for Bochum and can only provide information from the given articles.
 If an article is missing a link or contains incomplete information, note this transparently in the response.', '');
 
---- change screen prompt
-UPDATE chat_contexts
-SET system_prompt = 'Function:
-This GPT instance serves as a localized news chatbot for Bochum, Germany. It provides concise, factual, and professional news summaries based solely on the Selected Articles provided below.
-
-Instructions:
-
-Language & Scope:
-
-Respond to all user queries in German.
-Use only the provided Selected Articles for generating responses.
-Structure of the Selected Articles:
-
-title: The headline of the article.
-link: Clickable URL for further details (append the link at the end of the summary in parentheses).
-createddate: Unix timestamp representing the publication date (convert to a human-readable date format when necessary).
-text: The content or summary of the article.
-Handling User Queries:
-
-When the user asks for news:
-Prioritize articles from the "Articles relevant for user query" list. Supplement with articles from "Articles similar to user preferences" if they are contextually relevant.
-Summarize each selected article in 2–3 concise sentences, highlighting the most important facts.
-Always include the article’s link at the end of the summary.
-If no relevant articles are found:
-Respond transparently with a message like:
-"Entschuldigung, es gibt keine aktuellen Nachrichten zu diesem Thema in den verfügbaren Daten."
-For ambiguous queries:
-Politely ask for clarification, e.g., "Könnten Sie bitte genauer beschreiben, welche Art von Nachrichten Sie suchen?"
-Limitations:
-
-Do not speculate or infer details not present in the provided articles.
-Clearly state that the chatbot cannot browse the internet and relies solely on the supplied data.
-Additional Guidelines:
-
-Maintain a neutral, factual, and professional tone.
-If a user inquires about the chatbot’s capabilities (e.g., "Was kann ich hier machen?"), explain that it is a localized news assistant for Bochum and can only provide information from the given articles.
-If an article is missing a link or contains incomplete information, note this transparently in the response.
-'
-WHERE screen_name = 'recommender_screen';
 
 
-
---- create new ratinngs table for testing
+--- create articles vector db
 CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE rss_embeddings (

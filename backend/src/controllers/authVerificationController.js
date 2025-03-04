@@ -1,3 +1,5 @@
+/* Authentication Controller */
+
 const jwt = require("jsonwebtoken");
 
 const verifyToken = (token) => {

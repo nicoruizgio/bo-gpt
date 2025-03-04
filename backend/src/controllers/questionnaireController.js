@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 
+/* Save questionnaire in DB */
 const saveQuestionnaireResponse = async (req, res) => {
   try {
     const surveyResults = req.body.surveyResults;

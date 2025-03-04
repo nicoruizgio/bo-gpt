@@ -2,15 +2,17 @@ const pool = require("../config/db");
 const { getOpenAIInstance } = require("../config/openai");
 const { get_encoding } = require("tiktoken");
 
+/* Save user rating summaru (user preferences) in DB */
 const saveRatingSummary = async (req, res) => {
   const { chatLog } = req.body;
-  const participantId = req.user.id; // Get ID from authenticated user
+  const participantId = req.user.id;
 
   if (!chatLog || chatLog.length === 0) {
     return res.status(400).json({ error: "Chat log is required" });
   }
 
   try {
+    // Prompt to generate the user preferences summary
     const prompt = `
       Role:
 You are an intelligent assistant specializing in information retrieval and recommendation systems. Your task is to generate a concise similarity search query based on a list of articles that a user has rated between 1 and 5.
@@ -29,22 +31,12 @@ Generalizable format: The query should be suitable for vector-based search, keyw
 Ignore low-rated content: Do not incorporate articles rated 3 or below in the query formulation.
 Generate the query in English.
 `;
+
     const openai = getOpenAIInstance();
 
-    /*
-    const conversation_history = [
-      ...chatLog.map((msg) => ({
-        role: msg.role === "ai" ? "assistant" : "user",
-        content: msg.text,
-      })),
-    ];
-
-    console.log("Conversation History:", conversation_history);
-    */
-
     const conversation = chatLog
-  .map(msg => `${msg.role === "ai" ? "assistant" : "user"}: ${msg.text}`)
-  .join("\n");
+      .map(msg => `${msg.role === "ai" ? "assistant" : "user"}: ${msg.text}`)
+      .join("\n");
 
     console.log('Conversation:', conversation);
 

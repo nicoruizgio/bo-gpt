@@ -11,29 +11,26 @@ const {
   saveMessage,
 } = require("../helpers/openaiHelpers");
 
+/* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
   try {
     const { chatLog, screenName, conversationId } = req.body;
     const userId = req.user.id;
 
-    console.log("Screen Name:", JSON.stringify(screenName));
     console.log("CHAT LOG: ", chatLog)
 
+    // Check if screen name and chat log exists
     if (!screenName || !chatLog) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
+    // Define the variable that will store the updated system prompt (base promppt + time + retrieved articles)
     let updatedSystemPrompt;
-    const userMsg = chatLog.filter((msg) => msg.role === 'user').pop();
 
-    /*
-      if (userMsg) {
-        await saveMessage(conversationId, userMsg.role, userMsg.text);
-        }
-
-    */
+    // Logic for recommender screen
     if (screenName === "recommender_screen") {
 
+      // Query to retrieve the articles (only from the last 7 days)
       const articleSqlQuery = `
         SELECT id, title, summary, link, published_unix
         FROM rss_embeddings
@@ -42,26 +39,28 @@ const getCompletion = async (req, res) => {
         LIMIT 5;
       `;
 
+      // Query to retrieve the user preferences from DB
       const userSqlQuery =
         "SELECT summary FROM ratings WHERE participant_id = $1 ORDER BY created_at DESC LIMIT 1";
 
-      const { baseSystemPrompt } = await getParamsFromDb(screenName);
-      const userMessage = chatLog.filter((msg) => msg.role === 'user').pop()?.text || null
-      const userPreferences = await getUserPreferences(userSqlQuery, userId);
-      const userMessageEmbedding = await generateEmbedding(userMessage);
-      const userPreferencesEmbedding = await generateEmbedding(userPreferences);
-      const userMessageArticles = await vectorSearch(
+
+      const { baseSystemPrompt } = await getParamsFromDb(screenName); // get the base system prompt from DB
+      const userMessage = chatLog.filter((msg) => msg.role === 'user').pop()?.text || null // get the user message from the chat log
+      const userPreferences = await getUserPreferences(userSqlQuery, userId); // get user preferences
+      const userMessageEmbedding = await generateEmbedding(userMessage); // generate embeddings for the user message
+      const userPreferencesEmbedding = await generateEmbedding(userPreferences); // generate embeddings for the user preferences. TODO: save the embeddings to not generate it everytime
+      const userMessageArticles = await vectorSearch( // retrieve articles based on user message
         userMessageEmbedding,
         articleSqlQuery
       );
-      const userPreferencesArticles = await vectorSearch(
+      const userPreferencesArticles = await vectorSearch( // retrieve articles based on user preferences
         userPreferencesEmbedding,
         articleSqlQuery
       );
 
-      const context = `***Articles relevent for user query:*** \n ${userMessageArticles}\n\n ***Articles similar to user preferences***: \n${userPreferencesArticles}`;
-      // console.log(context);
+      const context = `***Articles relevent for user query:*** \n ${userMessageArticles}\n\n ***Articles similar to user preferences***: \n${userPreferencesArticles}`; // Merge the retrieve articles
 
+      // Update system prommpt (base prompt + context)
       updatedSystemPrompt = updatePrompt({
         screenName,
         baseSystemPrompt,
@@ -69,11 +68,14 @@ const getCompletion = async (req, res) => {
       });
        console.log(updatedSystemPrompt);
     }
+
+    // Logic for rating screen
     else if (screenName === "rating_screen") {
-      const { baseSystemPrompt, newsForRating } = await getParamsFromDb(
+      const { baseSystemPrompt, newsForRating } = await getParamsFromDb( // get base prompt and list of news articles to rate
         screenName
       );
 
+      // update system prompt
       updatedSystemPrompt = updatePrompt({
         screenName,
         baseSystemPrompt,
@@ -87,7 +89,6 @@ const getCompletion = async (req, res) => {
       updatedSystemPrompt
     );
 
-    //console.log(conversation_history)
 
     // Calculate and log token count
     const tokens = calculateTokenCount(conversation_history);
@@ -107,6 +108,7 @@ const getCompletion = async (req, res) => {
       }
     });
 
+    // Save response from AI into the DB
     await saveMessage(conversationId, "ai", finalAiMessage);
 
   } catch (error) {
