@@ -3,7 +3,7 @@ const { OpenAI } = require("openai");
 
 const getOpenAIInstance = (useOpenRouter) => {
   return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY_CAIS,
+    apiKey: process.env.OPENAI_API_KEY,
     baseURL: "https://api.openai.com/v1",
   });
 };
