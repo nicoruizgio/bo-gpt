@@ -8,5 +8,5 @@ const getOpenAIInstance = (useOpenRouter) => {
   });
 };
 
-// Export the function to dynamically create the OpenAI instance
+
 module.exports = { getOpenAIInstance };

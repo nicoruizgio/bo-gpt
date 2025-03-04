@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { createConversation } = require("../controllers/conversationController")
+const { createConversation } = require("../controllers/createConversationController")
 const authMiddleware = require("../middleware/authMiddleware")
 
-router.post("/conversations", authMiddleware, createConversation)
+router.post("/create-conversation", authMiddleware, createConversation)
 
 module.exports = router

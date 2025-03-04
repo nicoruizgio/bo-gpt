@@ -19,17 +19,17 @@ CREATE TABLE ratings (
 
 CREATE TABLE questionnaire_responses (
   id SERIAL PRIMARY KEY,
+  participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
   age INTEGER,
   gender VARCHAR(255),
   location VARCHAR(20),
   news_consumption_frequency VARCHAR(255),
   education VARCHAR(255),
-  _id INTEGER NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 
-
+-- Old stuff?
 CREATE TABLE news_articles_flexible (
     id SERIAL PRIMARY KEY,
     message_id TEXT,
@@ -53,18 +53,17 @@ CREATE TABLE chat_contexts (
 
 CREATE TABLE conversations (
   id SERIAL PRIMARY KEY,
-  participant_id INTEGER NOT NULL REFERENCES participants(id),
+  participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
-  conversation_id INTEGER NOT NULL REFERENCES conversations(id),
+  conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
   role VARCHAR(50) NOT NULL,
   message TEXT NOT NULL,
   sent_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
 
 INSERT INTO chat_contexts (screen_name, system_prompt, news_for_rating)
 VALUES

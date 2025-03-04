@@ -5,20 +5,18 @@ const verifyToken = (token) => {
 };
 
 const checkAuth = (req, res) => {
-  const token = req.cookies.token; // Retrieve token from cookies
+  const token = req.cookies.token;
 
   if (!token) {
-    // If token is not found, respond with a 401 Unauthorized status
     return res
       .status(401)
       .json({ error: "Not authenticated. No token provided." });
   }
 
   try {
-    const decoded = verifyToken(token); // Verify and decode the JWT token
+    const decoded = verifyToken(token);
     res.status(200).json({ authenticated: true });
   } catch (error) {
-    // Handle invalid or expired token
     res.status(401).json({ error: "Invalid or expired token" });
   }
 };

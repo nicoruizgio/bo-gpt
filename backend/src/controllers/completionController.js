@@ -18,22 +18,30 @@ const getCompletion = async (req, res) => {
 
     console.log("Screen Name:", JSON.stringify(screenName));
     console.log("CHAT LOG: ", chatLog)
+
     if (!screenName || !chatLog) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
     let updatedSystemPrompt;
+    const userMsg = chatLog.filter((msg) => msg.role === 'user').pop();
 
-    if (screenName === "recommender_screen") {
-      const userMsg = chatLog.filter((msg) => msg.role === 'user').pop();
+    /*
       if (userMsg) {
         await saveMessage(conversationId, userMsg.role, userMsg.text);
         }
+
+    */
+    if (screenName === "recommender_screen") {
+
       const articleSqlQuery = `
         SELECT id, title, summary, link, published_unix
         FROM rss_embeddings
-        ORDER BY embedding <-> $1 LIMIT 5;
+        WHERE published_unix >= (EXTRACT(EPOCH FROM NOW()) - 86400 * 7)
+        ORDER BY embedding <-> $1
+        LIMIT 5;
       `;
+
       const userSqlQuery =
         "SELECT summary FROM ratings WHERE participant_id = $1 ORDER BY created_at DESC LIMIT 1";
 
@@ -50,8 +58,10 @@ const getCompletion = async (req, res) => {
         userPreferencesEmbedding,
         articleSqlQuery
       );
+
       const context = `***Articles relevent for user query:*** \n ${userMessageArticles}\n\n ***Articles similar to user preferences***: \n${userPreferencesArticles}`;
       // console.log(context);
+
       updatedSystemPrompt = updatePrompt({
         screenName,
         baseSystemPrompt,
@@ -96,7 +106,7 @@ const getCompletion = async (req, res) => {
         finalAiMessage += partial;
       }
     });
-    console.log("Final AI message:", finalAiMessage);
+
     await saveMessage(conversationId, "ai", finalAiMessage);
 
   } catch (error) {

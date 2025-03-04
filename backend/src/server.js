@@ -18,7 +18,8 @@ const completionRoutes = require("./routes/completionRoutes");
 const userRoutes = require("./routes/userRoutes");
 const authVerificationRoute = require("./routes/authVerificationRoute");
 const questionnaireRoute = require("./routes/questionnaireRoute");
-const conversationRoute = require("./routes/conversationRoutes")
+const conversationRoute = require("./routes/conversationRoutes");
+const saveMessageRoute = require("./routes/saveMessageRoute")
 
 const app = express();
 
@@ -38,7 +39,8 @@ app.use("/api", completionRoutes);
 app.use("/api", userRoutes);
 app.use("/api", authVerificationRoute);
 app.use("/api",questionnaireRoute);
-app.use("/api", conversationRoute)
+app.use("/api", conversationRoute);
+app.use("/api", saveMessageRoute);
 
 app.listen(BACKEND_PORT, () => {
   console.log(

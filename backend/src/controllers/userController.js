@@ -76,14 +76,7 @@ const loginUser = async (req, res) => {
       sameSite: "Lax", // Makes the cookie available only on same-site requests
     });
 
-    // **DEBUGGING STEP: Log before sending response**
-    console.log("Login successful. Sending response:", {
-      token,
-      username: user.username,
-      participantId: user.id,
-    });
-
-    // **Send the response**
+    // Send the response
     res.setHeader("Content-Type", "application/json"); // Ensure JSON response
     res.status(200).json({ username: user.username, participantId: user.id });
   } catch (error) {

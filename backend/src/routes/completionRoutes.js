@@ -1,6 +1,6 @@
 const express = require("express");
 const { getCompletion } = require("../controllers/completionController");
-const { saveRatingSummary } = require("../controllers/ratingController");
+const { saveRatingSummary } = require("../controllers/saveRatingController");
 const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
