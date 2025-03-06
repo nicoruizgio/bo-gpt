@@ -3,8 +3,8 @@ import{  useState } from "react";
 import ChatMessage from "./chat-message/ChatMessage";
 import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import "./Chat.css";
-import HeaderComponent from "../HeaderComponent";
-import Spinner from "../Spinner";
+import HeaderComponent from "../header/HeaderComponent";
+import Spinner from "../spinner/Spinner";
 import {createConversation} from "../../api/conversationApi";
 import { saveMessage } from "../../api/saveMessageApi";
 

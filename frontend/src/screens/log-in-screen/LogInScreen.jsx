@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/loginApi";
 import "./LogInScreen.css";
-import HeaderComponent from "../../components/HeaderComponent";
-import Spinner from "../../components/Spinner";
+import HeaderComponent from "../../components/header/HeaderComponent";
+import Spinner from "../../components/spinner/Spinner";
 
 const LogInScreen = () => {
   const [credentials, setCredentials] = useState({

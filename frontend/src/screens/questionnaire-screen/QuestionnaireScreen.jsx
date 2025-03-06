@@ -2,7 +2,7 @@ import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 import questionnaireJson from './questionnaireJson';
-import HeaderComponent from '../../components/HeaderComponent';
+import HeaderComponent from '../../components/header/HeaderComponent';
 import styles from './stylesJson';
 import { saveQuestionnaireResults } from '../../api/questionnaireApi';
 import { useNavigate } from "react-router-dom";

@@ -9,8 +9,8 @@ import Introduction from "./screens/introduction-screen/Introduction-screen";
 import RecommenderScreen from "./screens/recommender-screen/RecommenderScreen";
 import LogInScreen from "./screens/log-in-screen/LogInScreen";
 import SignUpScreen from "./screens/sign-up-screen/SingUpScreen";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 import Instruction from "./screens/instruction-screen/InstructionScreen";
 import Questionnaire from "./screens/questionnaire-screen/QuestionnaireScreen";
 

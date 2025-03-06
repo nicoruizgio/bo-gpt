@@ -1,7 +1,7 @@
 import React from "react";
 import "./InstructionScreen.css";
 import { useNavigate } from "react-router-dom";
-import HeaderComponent from "../../components/HeaderComponent";
+import HeaderComponent from "../../components/header/HeaderComponent";
 
 const Instruction = () => {
   const navigate = useNavigate();

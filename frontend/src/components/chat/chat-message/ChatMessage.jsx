@@ -2,7 +2,7 @@ import "./ChatMessage.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import Spinner from "../../Spinner";
+import Spinner from "../../spinner/Spinner";
 
 const ChatMessage = ({ chatLog, isFetching }) => {
   return (
