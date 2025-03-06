@@ -1,6 +1,6 @@
 const { getOpenAIInstance } = require("../config/openai");
 const { get_encoding } = require("tiktoken");
-const pool = require("../config/db");
+const {pool} = require("../config/db");
 
 function getCurrentTimestamp() {
   return Date.now()

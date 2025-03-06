@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+const { pool, jasminTable } = require("../config/db");
 const {
   getParamsFromDb,
   getUserPreferences,
@@ -9,7 +9,7 @@ const {
   calculateTokenCount,
   streamChatCompletion,
   saveMessage,
-} = require("../helpers/openaiHelpers");
+} = require("../helpers/completionHelpers");
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
@@ -17,20 +17,17 @@ const getCompletion = async (req, res) => {
     const { chatLog, screenName, conversationId } = req.body;
     const userId = req.user.id;
 
-    console.log("CHAT LOG: ", chatLog)
+    console.log("CHAT LOG: ", chatLog);
 
-    // Check if screen name and chat log exists
+    // Validate input
     if (!screenName || !chatLog) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
-    // Define the variable that will store the updated system prompt (base promppt + time + retrieved articles)
-    let updatedSystemPrompt;
+    let updatedSystemPrompt; // Holds the modified system prompt
 
-    // Logic for recommender screen
+    // Recommender Screen Logic
     if (screenName === "recommender_screen") {
-
-      // Query to retrieve the articles (only from the last 7 days)
       const articleSqlQuery = `
         SELECT id, title, summary, link, published_unix
         FROM rss_embeddings
@@ -39,56 +36,61 @@ const getCompletion = async (req, res) => {
         LIMIT 5;
       `;
 
-      // Query to retrieve the user preferences from DB
-      const userSqlQuery =
-        "SELECT summary FROM ratings WHERE participant_id = $1 ORDER BY created_at DESC LIMIT 1";
+      const userSqlQuery = `
+        SELECT summary
+        FROM ratings
+        WHERE participant_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1;
+      `;
 
+      // Fetch base system prompt
+      const { baseSystemPrompt } = await getParamsFromDb(screenName, jasminTable);
 
-      const { baseSystemPrompt } = await getParamsFromDb(screenName); // get the base system prompt from DB
-      const userMessage = chatLog.filter((msg) => msg.role === 'user').pop()?.text || null // get the user message from the chat log
-      const userPreferences = await getUserPreferences(userSqlQuery, userId); // get user preferences
-      const userMessageEmbedding = await generateEmbedding(userMessage); // generate embeddings for the user message
-      const userPreferencesEmbedding = await generateEmbedding(userPreferences); // generate embeddings for the user preferences. TODO: save the embeddings to not generate it everytime
-      const userMessageArticles = await vectorSearch( // retrieve articles based on user message
-        userMessageEmbedding,
-        articleSqlQuery
-      );
-      const userPreferencesArticles = await vectorSearch( // retrieve articles based on user preferences
-        userPreferencesEmbedding,
-        articleSqlQuery
-      );
+      // Get the latest user message from chat log
+      const userMessage = chatLog.filter(msg => msg.role === "user").pop()?.text || null;
+      const userPreferences = await getUserPreferences(userSqlQuery, userId);
 
-      const context = `***Articles relevent for user query:*** \n ${userMessageArticles}\n\n ***Articles similar to user preferences***: \n${userPreferencesArticles}`; // Merge the retrieve articles
+      // Generate embeddings only if data exists
+      const userMessageEmbedding = userMessage ? await generateEmbedding(userMessage) : null;
+      const userPreferencesEmbedding = userPreferences ? await generateEmbedding(userPreferences) : null;
 
-      // Update system prommpt (base prompt + context)
+      // Retrieve relevant articles
+      const userMessageArticles = userMessageEmbedding ? await vectorSearch(userMessageEmbedding, articleSqlQuery) : "";
+      const userPreferencesArticles = userPreferencesEmbedding ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery) : "";
+
+      // Merge retrieved articles into context
+      const context = `
+        ***Articles relevant to user query:***
+        ${userMessageArticles}
+
+        ***Articles similar to user preferences:***
+        ${userPreferencesArticles}
+      `;
+
+      // Update system prompt with context
       updatedSystemPrompt = updatePrompt({
         screenName,
         baseSystemPrompt,
         context,
       });
-       console.log(updatedSystemPrompt);
+
+      console.log(updatedSystemPrompt);
     }
 
-    // Logic for rating screen
+    // Rating Screen Logic
     else if (screenName === "rating_screen") {
-      const { baseSystemPrompt, newsForRating } = await getParamsFromDb( // get base prompt and list of news articles to rate
-        screenName
-      );
+      const { baseSystemPrompt, newsForRating } = await getParamsFromDb(screenName);
 
-      // update system prompt
       updatedSystemPrompt = updatePrompt({
         screenName,
         baseSystemPrompt,
-        newsForRating: newsForRating,
+        newsForRating,
       });
     }
 
-    // Build the conversation history with the updated system prompt
-    const conversation_history = createConversationHistory(
-      chatLog,
-      updatedSystemPrompt
-    );
-
+    // Construct conversation history
+    const conversation_history = createConversationHistory(chatLog, updatedSystemPrompt);
 
     // Calculate and log token count
     const tokens = calculateTokenCount(conversation_history);
@@ -101,14 +103,15 @@ const getCompletion = async (req, res) => {
     if (res.flushHeaders) res.flushHeaders();
 
     let finalAiMessage = "";
-    // Stream the response from OpenAI to the client
+
+    // Stream AI response
     await streamChatCompletion(conversation_history, res, {
       onUpdate: (partial) => {
         finalAiMessage += partial;
-      }
+      },
     });
 
-    // Save response from AI into the DB
+    // Save AI response in database
     await saveMessage(conversationId, "ai", finalAiMessage);
 
   } catch (error) {

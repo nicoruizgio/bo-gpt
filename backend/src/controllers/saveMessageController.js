@@ -1,4 +1,4 @@
-const { saveMessage } = require("../helpers/openaiHelpers")
+const { saveMessage } = require("../helpers/completionHelpers")
 
 /* Insert new message record in DB*/
 const saveMessageController = async (req, res) => {
