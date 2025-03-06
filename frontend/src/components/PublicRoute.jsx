@@ -3,21 +3,20 @@ import { Navigate, Outlet } from "react-router-dom";
 import { isAuthenticated } from "../api/authenticationApi";
 
 const PublicRoute = () => {
-  const [authenticated, setAuthenticated] = useState(null); // Start with null (to handle loading state)
-
+  const [authenticated, setAuthenticated] = useState(null);
   useEffect(() => {
     // Check if the user is authenticated when the component mounts
     const checkAuth = async () => {
-      const status = await isAuthenticated(); // Call the async function
-      setAuthenticated(status); // Update the state
+      const status = await isAuthenticated();
+      setAuthenticated(status);
     };
 
     checkAuth();
-  }, []); // Empty dependency array means this effect runs once when the component mounts
+  }, []);
 
-  // Show loading state or redirect based on authentication
+  // show loading state or redirect
   if (authenticated === null) {
-    return <div>Loading...</div>; // Or show a spinner, depending on your preference
+    return <div>Loading...</div>;
   }
 
   return authenticated ? <Navigate to="/questionnaire" /> : <Outlet />;

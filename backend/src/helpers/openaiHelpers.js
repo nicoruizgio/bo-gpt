@@ -8,7 +8,7 @@ function getCurrentTimestamp() {
 
 async function getParamsFromDb(screenName) {
   const result = await pool.query(
-    "SELECT system_prompt, news_for_rating FROM chat_contexts WHERE screen_name = $1",
+    "SELECT system_prompt, news_for_rating FROM chat_contexts WHERE screen_name = $1", // CHANGE here
     [screenName]
   );
 

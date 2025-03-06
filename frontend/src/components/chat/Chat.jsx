@@ -25,7 +25,6 @@ const Chat = ({
 
   async function handleSubmit() {
     if (message.trim() === "") return;
-    //if (maxMessages && userMessageCount >= maxMessages) return;
 
     let currentConversationId = conversationId;
     if(!currentConversationId) {

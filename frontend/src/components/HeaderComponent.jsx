@@ -9,13 +9,11 @@ const HeaderComponent = ({ isLoggedIn, screenName, setChatLog, setConversationId
 
   const handleSignOut = async () => {
     try {
-      // Call the logout function from the API file
+
       await logoutUser();
 
-      // Clear user data from localStorage
       localStorage.clear();
 
-      // Redirect the user to the login page after signing out
       navigate("/log-in");
     } catch (error) {
       console.error("Error during sign out:", error);

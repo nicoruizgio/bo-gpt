@@ -8,15 +8,12 @@ const saveQuestionnaireResponse = async (req, res) => {
       return res.status(400).json({error: "No survey results provided"});
     }
 
-
     const { age, gender, location, newsConsumptionFrequency, education } = surveyResults
-
 
     const userId = req.user && req.user.id;
     if (!userId) {
       return res.status(401).json({error: "User not authenticated"});
     }
-
 
     const queryText = `
     INSERT INTO questionnaire_responses
@@ -27,7 +24,6 @@ const saveQuestionnaireResponse = async (req, res) => {
     `;
 
     const values = [userId, age, gender, location, newsConsumptionFrequency, education];
-
 
     const result = await pool.query(queryText, values);
     res.status(201).json({id: result.rows[0].id});

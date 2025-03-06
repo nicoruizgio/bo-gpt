@@ -53,7 +53,6 @@ const SignUpScreen = () => {
     }
 
     try {
-      // Register user and store token
       await registerUser(credentials.username, credentials.password);
       setModal(true);
       setTimeout(() => {

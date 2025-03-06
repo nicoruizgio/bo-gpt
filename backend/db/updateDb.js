@@ -35,6 +35,7 @@ const updatePrompts = async () => {
   ];
   console.log("propmpts: ", prompts)
     for (const {screen, prompt} of updates) {
+      // CHANGE HERE
       const query = `
         UPDATE chat_contexts
         SET system_prompt = $1

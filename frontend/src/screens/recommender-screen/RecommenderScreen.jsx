@@ -21,7 +21,7 @@ const RecommenderScreen = () => {
     true
   );
 
-  // On unmount (i.e. when navigating away), clear the sessionStorage keys.
+
   useEffect(() => {
     return () => {
       sessionStorage.removeItem("recommenderChatLog");
