@@ -6,17 +6,18 @@ function getCurrentTimestamp() {
   return Date.now()
 }
 
-async function getParamsFromDb(screenName) {
-  const result = await pool.query(
-    "SELECT system_prompt, news_for_rating FROM chat_contexts WHERE screen_name = $1", // CHANGE here
-    [screenName]
-  );
+async function getParamsFromDb(screenName, jasminTable) {
+  const result = jasminTable ? await pool.query(
+    "SELECT system_prompt, news_for_rating FROM j_chat_contexts WHERE screen_name = $1",
+    [screenName]): await pool.query(
+      "SELECT system_prompt, news_for_rating FROM chat_contexts WHERE screen_name = $1",
+      [screenName]);
 
   if (result.rows.length === 0) {
     throw new Error("Screen configuration not found");
   }
-
   const baseSystemPrompt = result.rows[0].system_prompt;
+
   if (screenName === "rating_screen") {
     const newsForRating = result.rows[0].news_for_rating;
     return { baseSystemPrompt, newsForRating };

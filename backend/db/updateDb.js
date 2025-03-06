@@ -1,23 +1,7 @@
-const { Pool } = require("pg");
+const { pool, jasminTable} = require("../src/config/db");
 const dotenv = require("dotenv");
 const  prompts = require("./prompts");
 
-// Load the correct environment file
-dotenv.config({
-  path:
-    process.env.NODE_ENV === "production"
-      ? ".env.production"
-      : ".env.development",
-});
-
-// Create the PostgreSQL connection pool
-const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT || 5432,
-});
 
 // Update prompts
 const updatePrompts = async () => {
@@ -36,12 +20,17 @@ const updatePrompts = async () => {
   console.log("propmpts: ", prompts)
     for (const {screen, prompt} of updates) {
       // CHANGE HERE
-      const query = `
-        UPDATE chat_contexts
+      const query = jasminTable ? `
+        UPDATE j_chat_contexts
         SET system_prompt = $1
         WHERE screen_name = $2;
-      `
+      ` : `
+      UPDATE chat_contexts
+      SET system_prompt = $1
+      WHERE screen_name = $2;
+    `
       await client.query(query, [prompt, screen]);
+      jasminTable ? console.log('Updating Jasmins table') : console.log('Updating Nicos table')
       console.log(`Updated system_prompt for ${screen}`);
     }
     console.log('All prompts updated sucessfuly')
