@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+const {pool} = require("../config/db");
 
 /* Save questionnaire in DB */
 const saveQuestionnaireResponse = async (req, res) => {

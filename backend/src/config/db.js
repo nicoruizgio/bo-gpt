@@ -9,7 +9,6 @@ dotenv.config({
       : ".env.development",
 });
 
-const jasminTable = false;
 
 // Postgres connection
 const pool = new Pool({
@@ -22,4 +21,4 @@ const pool = new Pool({
 
 console.log(`Connected to PostgreSQL on ${process.env.POSTGRES_HOST}`);
 
-module.exports = {pool, jasminTable};
+module.exports = {pool};

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { registerUser } from "../../api/registerApi";
 import { useNavigate } from "react-router-dom";
 import "./SignUpScreen.css";
@@ -13,14 +13,14 @@ const SignUpScreen = () => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [modal, setModal] = useState(false);
-
   const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

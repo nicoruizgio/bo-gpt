@@ -1,4 +1,4 @@
-const pool = require("../config/db")
+const {pool} = require("../config/db")
 
 /* Insert new conversation record in DB */
 const createConversation = async (req, res) => {
@@ -15,7 +15,7 @@ const createConversation = async (req, res) => {
     `;
 
     const result = await pool.query(query, [userId]);
-    res.status(201).json({id: result.rows[0].id});
+    res.status(201).json({id: result.rows[0].id}); // return the conversation id to reference it in the fronted.
   } catch (error) {
     console.error("Error creating conversation", error);
     res.status(500).json({error: "internal server error"})

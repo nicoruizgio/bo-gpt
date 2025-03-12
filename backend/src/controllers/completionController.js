@@ -1,23 +1,20 @@
-const { pool, jasminTable } = require("../config/db");
+const { pool } = require("../config/db");
 const {
-  getParamsFromDb,
   getUserPreferences,
   generateEmbedding,
   vectorSearch,
-  updatePrompt,
   createConversationHistory,
   calculateTokenCount,
   streamChatCompletion,
   saveMessage,
 } = require("../helpers/completionHelpers");
+const { rating_screen_prompt, recommender_screen_prompt} = require("../prompts/nicoPrompts") // Change here to jasminPrompts
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
   try {
     const { chatLog, screenName, conversationId } = req.body;
     const userId = req.user.id;
-
-    console.log("CHAT LOG: ", chatLog);
 
     // Validate input
     if (!screenName || !chatLog) {
@@ -44,9 +41,6 @@ const getCompletion = async (req, res) => {
         LIMIT 1;
       `;
 
-      // Fetch base system prompt
-      const { baseSystemPrompt } = await getParamsFromDb(screenName, jasminTable);
-
       // Get the latest user message from chat log
       const userMessage = chatLog.filter(msg => msg.role === "user").pop()?.text || null;
       const userPreferences = await getUserPreferences(userSqlQuery, userId);
@@ -61,33 +55,26 @@ const getCompletion = async (req, res) => {
 
       // Merge retrieved articles into context
       const context = `
-        ***Articles relevant to user query:***
-        ${userMessageArticles}
+      ***Articles relevant to user query:***
+      ${userMessageArticles}
 
-        ***Articles similar to user preferences:***
-        ${userPreferencesArticles}
+      ***Articles similar to user preferences:***
+      ${userPreferencesArticles}
       `;
 
-      // Update system prompt with context
-      updatedSystemPrompt = updatePrompt({
-        screenName,
-        baseSystemPrompt,
-        context,
-      });
+      updatedSystemPrompt = `
+      ${recommender_screen_prompt}
+      ${context}
+      `
 
       console.log(updatedSystemPrompt);
     }
 
     // Rating Screen Logic
     else if (screenName === "rating_screen") {
-      const { baseSystemPrompt, newsForRating } = await getParamsFromDb(screenName);
-
-      updatedSystemPrompt = updatePrompt({
-        screenName,
-        baseSystemPrompt,
-        newsForRating,
-      });
+     updatedSystemPrompt = rating_screen_prompt
     }
+
 
     // Construct conversation history
     const conversation_history = createConversationHistory(chatLog, updatedSystemPrompt);

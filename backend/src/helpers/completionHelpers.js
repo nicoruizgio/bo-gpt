@@ -6,25 +6,6 @@ function getCurrentTimestamp() {
   return Date.now()
 }
 
-async function getParamsFromDb(screenName, jasminTable) {
-  const result = jasminTable ? await pool.query(
-    "SELECT system_prompt, news_for_rating FROM j_chat_contexts WHERE screen_name = $1",
-    [screenName]): await pool.query(
-      "SELECT system_prompt, news_for_rating FROM chat_contexts WHERE screen_name = $1",
-      [screenName]);
-
-  if (result.rows.length === 0) {
-    throw new Error("Screen configuration not found");
-  }
-  const baseSystemPrompt = result.rows[0].system_prompt;
-
-  if (screenName === "rating_screen") {
-    const newsForRating = result.rows[0].news_for_rating;
-    return { baseSystemPrompt, newsForRating };
-  }
-  return { baseSystemPrompt };
-}
-
 async function getUserPreferences(sqlQuery, userId) {
   const result = await pool.query(sqlQuery, [userId]);
   if (result.rows.length > 0) {
@@ -59,20 +40,6 @@ async function vectorSearch(embedding, sqlQuery) {
     retrievedArticles = "No relevant articles found.";
   }
   return retrievedArticles;
-}
-
-function updatePrompt({
-  baseSystemPrompt,
-  context,
-  screenName,
-  newsForRating,
-}) {
-  if (screenName === "recommender_screen") {
-    return `${baseSystemPrompt}\n\n Today's date: ${getCurrentTimestamp()} \n\nSelected Articles:\n${context}`;
-  } else if (screenName === "rating_screen") {
-    return `${baseSystemPrompt}\n\nNews for Rating: ${newsForRating}`;
-  }
-  return baseSystemPrompt;
 }
 
 function createConversationHistory(chatLog, updatedSystemPrompt) {
@@ -139,11 +106,9 @@ async function saveMessage (conversationId, role, message)  {
 }
 
 module.exports = {
-  getParamsFromDb,
   getUserPreferences,
   generateEmbedding,
   vectorSearch,
-  updatePrompt,
   createConversationHistory,
   calculateTokenCount,
   streamChatCompletion,

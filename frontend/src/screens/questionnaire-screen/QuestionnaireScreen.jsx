@@ -32,8 +32,6 @@ const Questionnaire = () => {
       }
     });
 
-    console.log("survey results: ", surveyResult)
-
     try {
       await saveQuestionnaireResults(surveyResult);
       //options.showSaveSuccess();

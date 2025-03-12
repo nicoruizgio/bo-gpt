@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+const {pool} = require("../config/db");
 const { getOpenAIInstance } = require("../config/openai");
 const { get_encoding } = require("tiktoken");
 
