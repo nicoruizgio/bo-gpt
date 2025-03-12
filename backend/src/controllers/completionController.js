@@ -4,6 +4,7 @@ const {
   generateEmbedding,
   vectorSearch,
   createConversationHistory,
+  doRAG,
   calculateTokenCount,
   streamChatCompletion,
   saveMessage,
@@ -21,63 +22,21 @@ const getCompletion = async (req, res) => {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
-    let updatedSystemPrompt; // Holds the modified system prompt
+    let systemPrompt; // Holds the modified system prompt
 
     // Recommender Screen Logic
     if (screenName === "recommender_screen") {
-      const articleSqlQuery = `
-        SELECT id, title, summary, link, published_unix
-        FROM rss_embeddings
-        WHERE published_unix >= (EXTRACT(EPOCH FROM NOW()) - 86400 * 7)
-        ORDER BY embedding <-> $1
-        LIMIT 5;
-      `;
-
-      const userSqlQuery = `
-        SELECT summary
-        FROM ratings
-        WHERE participant_id = $1
-        ORDER BY created_at DESC
-        LIMIT 1;
-      `;
-
-      // Get the latest user message from chat log
-      const userMessage = chatLog.filter(msg => msg.role === "user").pop()?.text || null;
-      const userPreferences = await getUserPreferences(userSqlQuery, userId);
-
-      // Generate embeddings only if data exists
-      const userMessageEmbedding = userMessage ? await generateEmbedding(userMessage) : null;
-      const userPreferencesEmbedding = userPreferences ? await generateEmbedding(userPreferences) : null;
-
-      // Retrieve relevant articles
-      const userMessageArticles = userMessageEmbedding ? await vectorSearch(userMessageEmbedding, articleSqlQuery) : "";
-      const userPreferencesArticles = userPreferencesEmbedding ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery) : "";
-
-      // Merge retrieved articles into context
-      const context = `
-      ***Articles relevant to user query:***
-      ${userMessageArticles}
-
-      ***Articles similar to user preferences:***
-      ${userPreferencesArticles}
-      `;
-
-      updatedSystemPrompt = `
-      ${recommender_screen_prompt}
-      ${context}
-      `
-
-      console.log(updatedSystemPrompt);
+      systemPrompt = await doRAG(chatLog, userId, ragType = 'simpleRAG')
     }
 
     // Rating Screen Logic
     else if (screenName === "rating_screen") {
-     updatedSystemPrompt = rating_screen_prompt
+      systemPrompt = rating_screen_prompt
     }
 
 
     // Construct conversation history
-    const conversation_history = createConversationHistory(chatLog, updatedSystemPrompt);
+    const conversation_history = createConversationHistory(chatLog, systemPrompt);
 
     // Calculate and log token count
     const tokens = calculateTokenCount(conversation_history);

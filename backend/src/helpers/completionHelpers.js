@@ -1,5 +1,6 @@
 const { getOpenAIInstance } = require("../config/openai");
 const { get_encoding } = require("tiktoken");
+const {recommender_screen_multiquery_prompt, recommender_screen_simple_prompt} = require("../prompts/nicoPrompts")
 const {pool} = require("../config/db");
 
 function getCurrentTimestamp() {
@@ -53,6 +54,81 @@ function createConversationHistory(chatLog, updatedSystemPrompt) {
       })),
   ];
 }
+
+async function doRAG(chatLog, userId, ragType) {
+  // SQL queries for retrieving articles and user preferences
+  const articleSqlQuery = `
+    SELECT id, title, summary, link, published_unix
+    FROM rss_embeddings
+    WHERE published_unix >= (EXTRACT(EPOCH FROM NOW()) - 86400 * 7)
+    ORDER BY embedding <-> $1
+    LIMIT 5;
+  `;
+
+  const userSqlQuery = `
+    SELECT summary
+    FROM ratings
+    WHERE participant_id = $1
+    ORDER BY created_at DESC
+    LIMIT 1;
+  `;
+
+  // Get the latest user message from chat log
+  const userMessage = chatLog.filter(msg => msg.role === "user").pop()?.text || null;
+
+  // Retrieve user preferences from the database
+  const userPreferences = await getUserPreferences(userSqlQuery, userId);
+
+  // Generate embedding and retrieve articles based on the latest user message
+  const userMessageEmbedding = userMessage ? await generateEmbedding(userMessage) : null;
+  const userMessageArticles = userMessageEmbedding ? await vectorSearch(userMessageEmbedding, articleSqlQuery) : "";
+
+  let systemPrompt = "";
+  let context = "";
+
+  if (ragType === 'multiqueryRAG') {
+    // Generate embedding and retrieve articles based on user preferences
+    const userPreferencesEmbedding = userPreferences ? await generateEmbedding(userPreferences) : null;
+    const userPreferencesArticles = userPreferencesEmbedding ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery) : "";
+
+    // Create a combined context for multiquery RAG
+    context = `
+    ***Articles relevant to user query:***
+    ${userMessageArticles}
+
+    ***Articles similar to user preferences:***
+    ${userPreferencesArticles}
+    `;
+
+    systemPrompt = `
+    ${recommender_screen_multiquery_prompt}
+    ${context}
+        `;
+      } else if (ragType === 'simpleRAG') {
+        // Create a simpler context only based on the user query
+        context = `
+    ***Articles relevant to user query:***
+    ${userMessageArticles}
+    `;
+
+    systemPrompt = `
+    ${recommender_screen_simple_prompt}
+    ${context}
+
+    ***User Preferences***
+    ${userPreferences}
+    `;
+  } else {
+    console.error(`Unknown RAG type: ${ragType}`);
+    throw new Error(`Unsupported ragType: ${ragType}`);
+  }
+
+  console.log(`RAG TYPE: ${ragType === 'multiqueryRAG' ? 'MULTIQUERY' : 'SIMPLE'}`);
+  console.log(systemPrompt);
+
+  return systemPrompt;
+}
+
 
 function calculateTokenCount(conversation_history) {
   const encoding = get_encoding("cl100k_base");
@@ -110,6 +186,7 @@ module.exports = {
   generateEmbedding,
   vectorSearch,
   createConversationHistory,
+  doRAG,
   calculateTokenCount,
   streamChatCompletion,
   saveMessage
