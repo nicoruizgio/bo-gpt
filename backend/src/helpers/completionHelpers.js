@@ -3,7 +3,7 @@ const { get_encoding } = require("tiktoken");
 const {
   recommender_screen_multiquery_prompt,
   recommender_screen_simple_prompt,
-} = require("../prompts/nicoPrompts");
+} = require("../prompts/prompts");
 const { pool } = require("../config/db");
 
 function getCurrentTimestamp() {

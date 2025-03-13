@@ -9,7 +9,7 @@ const {
   streamChatCompletion,
   saveMessage,
 } = require("../helpers/completionHelpers");
-const { rating_screen_prompt, recommender_screen_prompt} = require("../prompts/nicoPrompts") // Change here to jasminPrompts
+const { rating_screen_prompt} = require("../prompts/prompts")
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {

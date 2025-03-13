@@ -6,7 +6,7 @@ import { storeRatingSummary } from "../../api/storeRatingsApi";
 import { usePersistedState } from "../../hooks/usePersistedState";
 
 const RatingScreen = () => {
-  const [chatLog, setChatLog] = useState([{id: 'ai-stream', role: "ai", text: "Hi, I'm Bo-GPT and I'll be presenting 36 news articles for you to rate from 1 to 5. Are you ready?"}]);
+  const [chatLog, setChatLog] = useState([{id: 'ai-stream', role: "ai", text: "Hallo, ich bin Bo-GPT und werde Ihnen 36 Nachrichtenartikel präsentieren, die Sie von 1 bis 5 bewerten können. Bist du bereit?"}]);
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = usePersistedState("ratingConversationId", null)
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const RatingScreen = () => {
         screenName={"rating_screen"}
         chatLog={chatLog}
         setChatLog={setChatLog}
-        maxMessages={5}
+        maxMessages={36}
         handleNext={handleNext}
         loading={loading}
         conversationId={conversationId}

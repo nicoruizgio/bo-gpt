@@ -1,5 +1,6 @@
-const {pool} = require("../config/db");
+const { pool } = require("../config/db");
 const { getOpenAIInstance } = require("../config/openai");
+const { get_user_preferences_prompt } = require("../prompts/prompts");
 const { get_encoding } = require("tiktoken");
 
 /* Save user rating summaru (user preferences) in DB */
@@ -12,43 +13,22 @@ const saveRatingSummary = async (req, res) => {
   }
 
   try {
-    // Prompt to generate the user preferences summary
-    const prompt = `
-      Role:
-You are an intelligent assistant specializing in information retrieval and recommendation systems. Your task is to generate a concise similarity search query based on a list of articles that a user has rated between 1 and 5.
-
-Task:
-
-You will receive a list of articles, each accompanied by a user rating from 1 to 5.
-Your job is to generate a concise search query that retrieves articles similar to those rated 4 and 5.
-The query should capture key themes, topics, and relevant metadata (e.g., keywords, concepts) of the highly-rated articles to ensure effective similarity-based search.
-Requirements for the search query:
-
-Focus on top-rated articles: Only consider articles rated 4 or 5 when generating the query.
-Extract key topics: Identify the most important themes, keywords, or phrases from these articles.
-Concise output: The query should be short but effective, optimizing relevance in a similarity-based search.
-Generalizable format: The query should be suitable for vector-based search, keyword-based search, or hybrid retrieval methods.
-Ignore low-rated content: Do not incorporate articles rated 3 or below in the query formulation.
-Generate the query in English.
-`;
-
     const openai = getOpenAIInstance();
 
     const conversation = chatLog
-      .map(msg => `${msg.role === "ai" ? "assistant" : "user"}: ${msg.text}`)
+      .map((msg) => `${msg.role === "ai" ? "assistant" : "user"}: ${msg.text}`)
       .join("\n");
 
-    console.log('Conversation:', conversation);
+    console.log("Conversation:", conversation);
 
     // Generate summary from OpenAI
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        {role: 'system', content: prompt},
-        {role: 'user', content: conversation}
-      ]
+        { role: "system", content: get_user_preferences_prompt},
+        { role: "user", content: conversation },
+      ],
     });
-
 
     const summaryText = response.choices[0]?.message?.content?.trim();
     if (!summaryText) {
