@@ -14,11 +14,9 @@ const Instruction = () => {
       <HeaderComponent isLoggedIn={true} />
 
       <div className="screen-container introduction">
-        <h2>Local News Recommender</h2>
+        <h2>Lokale Nachrichtenempfehlungen</h2>
         <p className="introduction-text">
-          In the following page you will interact with an AI chatbot that will
-          recommend you news articles from Bochum based on your news
-          preferences.
+        Auf der folgenden Seite können Sie mit einem KI-Chatbot interagieren, der Ihnen auf der Grundlage Ihrer Nachrichtenpräferenzen Nachrichtenartikel aus Bochum empfiehlt.
         </p>
         <button className="button" onClick={handleStart}>
           Start

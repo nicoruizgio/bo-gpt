@@ -1,4 +1,4 @@
-const {pool} = require("../config/db");
+const { pool } = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -42,7 +42,6 @@ const registerUser = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 //Log in
 const loginUser = async (req, res) => {
@@ -89,7 +88,6 @@ const loginUser = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 // Log out
 const logoutUser = (req, res) => {

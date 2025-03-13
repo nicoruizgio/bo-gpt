@@ -10,7 +10,7 @@ const RecommenderScreen = () => {
       {
         id: "ai-stream",
         role: "ai",
-        text: "Hello! I'm here to provide you with the latest news about Bochum, Germany. How can I assist you today?"
+        text: "Hallo! Mein Name ist Bo-GPT und ich bin hier, um Sie mit den neuesten Nachrichten über Bochum, Deutschland, zu versorgen. Welches Thema würden Sie gerne lesen?"
       }
     ],
     true

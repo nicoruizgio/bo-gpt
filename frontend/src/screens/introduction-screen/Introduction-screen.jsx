@@ -14,11 +14,10 @@ const Introduction = () => {
       <HeaderComponent isLoggedIn={true} />
 
       <div className="screen-container introduction">
-        <h2>Welcome to BO-GPT</h2>
+        <h2>Willkommen bei BO-GPT</h2>
         <p className="introduction-text">
-          In the following page you will interact with an AI chatbot that will
-          present you with 16 news articles. <br /> Rate them from 1 to 5
-          according to your preference. Press start to begin.
+        Auf der folgenden Seite werden Sie mit einem KI-Chatbot interagieren, der Ihnen 16 Nachrichtenartikel präsentiert.
+        Bewerten Sie diese je nach Ihren Vorlieben von 1 bis 5. Drücken Sie auf Start, um zu beginnen.
         </p>
         <button className="button" onClick={handleStart}>
           Start

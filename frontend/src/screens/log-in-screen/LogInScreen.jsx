@@ -45,14 +45,14 @@ const LogInScreen = () => {
     <>
       <HeaderComponent isLoggedIn={false} />
       <div className="screen-container login">
-        <h2>Log In</h2>
+        <h2>Anmelden</h2>
         {error && <p className="error-message">{error}</p>}
         <form className="login-form" onSubmit={handleSubmit}>
           <label>
             <input
               type="text"
               className="input"
-              placeholder="Username"
+              placeholder="Benutzername"
               name="username"
               value={credentials.username}
               onChange={handleChange}
@@ -64,18 +64,18 @@ const LogInScreen = () => {
               type="password"
               className="input"
               name="password"
-              placeholder="Password"
+              placeholder="Passwort"
               value={credentials.password}
               onChange={handleChange}
               required
             />
           </label>
           <button className="button login" type="submit" disabled={loading}>
-            {loading ? <Spinner /> : "Log in"}
+            {loading ? <Spinner /> : "Anmelden"}
           </button>
         </form>
         <p className="create-new-account" onClick={() => navigate("/sign-up")}>
-          Create New Account
+          Neues Konto erstellen
         </p>
       </div>
     </>

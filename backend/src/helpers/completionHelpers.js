@@ -1,10 +1,13 @@
 const { getOpenAIInstance } = require("../config/openai");
 const { get_encoding } = require("tiktoken");
-const {recommender_screen_multiquery_prompt, recommender_screen_simple_prompt} = require("../prompts/nicoPrompts")
-const {pool} = require("../config/db");
+const {
+  recommender_screen_multiquery_prompt,
+  recommender_screen_simple_prompt,
+} = require("../prompts/nicoPrompts");
+const { pool } = require("../config/db");
 
 function getCurrentTimestamp() {
-  return Date.now()
+  return Date.now();
 }
 
 async function getUserPreferences(sqlQuery, userId) {
@@ -18,7 +21,7 @@ async function getUserPreferences(sqlQuery, userId) {
 }
 
 async function generateEmbedding(text) {
-  console.log('TEXT TO EMBEDDING: ', text)
+  console.log("TEXT TO EMBEDDING: ", text);
   const openai = getOpenAIInstance();
   const embeddingResponse = await openai.embeddings.create({
     model: "text-embedding-ada-002",
@@ -74,40 +77,48 @@ async function doRAG(chatLog, userId, ragType) {
   `;
 
   // Get the latest user message from chat log
-  const userMessage = chatLog.filter(msg => msg.role === "user").pop()?.text || null;
+  const userMessage =
+    chatLog.filter((msg) => msg.role === "user").pop()?.text || null;
 
   // Retrieve user preferences from the database
   const userPreferences = await getUserPreferences(userSqlQuery, userId);
 
   // Generate embedding and retrieve articles based on the latest user message
-  const userMessageEmbedding = userMessage ? await generateEmbedding(userMessage) : null;
-  const userMessageArticles = userMessageEmbedding ? await vectorSearch(userMessageEmbedding, articleSqlQuery) : "";
+  const userMessageEmbedding = userMessage
+    ? await generateEmbedding(userMessage)
+    : null;
+  const userMessageArticles = userMessageEmbedding
+    ? await vectorSearch(userMessageEmbedding, articleSqlQuery)
+    : "";
 
   let systemPrompt = "";
   let context = "";
 
-  if (ragType === 'multiqueryRAG') {
+  if (ragType === "multiqueryRAG") {
     // Generate embedding and retrieve articles based on user preferences
-    const userPreferencesEmbedding = userPreferences ? await generateEmbedding(userPreferences) : null;
-    const userPreferencesArticles = userPreferencesEmbedding ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery) : "";
+    const userPreferencesEmbedding = userPreferences
+      ? await generateEmbedding(userPreferences)
+      : null;
+    const userPreferencesArticles = userPreferencesEmbedding
+      ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery)
+      : "";
 
     // Create a combined context for multiquery RAG
     context = `
-    ***Articles relevant to user query:***
+    ***Articles Relevant for User Message:***
     ${userMessageArticles}
 
-    ***Articles similar to user preferences:***
-    ${userPreferencesArticles}
-    `;
+    ***Articles Relevant for User Preferences:***
+    ${userPreferencesArticles}`;
 
     systemPrompt = `
     ${recommender_screen_multiquery_prompt}
-    ${context}
-        `;
-      } else if (ragType === 'simpleRAG') {
-        // Create a simpler context only based on the user query
-        context = `
-    ***Articles relevant to user query:***
+    ${context}`;
+  } else if (ragType === "simpleRAG") {
+    // Create a simpler context only based on the user query
+    context = `
+    *** Todays date: ${getCurrentTimestamp}
+    ***Retrieved Articles:***
     ${userMessageArticles}
     `;
 
@@ -123,12 +134,13 @@ async function doRAG(chatLog, userId, ragType) {
     throw new Error(`Unsupported ragType: ${ragType}`);
   }
 
-  console.log(`RAG TYPE: ${ragType === 'multiqueryRAG' ? 'MULTIQUERY' : 'SIMPLE'}`);
+  console.log(
+    `RAG TYPE: ${ragType === "multiqueryRAG" ? "MULTIQUERY" : "SIMPLE"}`
+  );
   console.log(systemPrompt);
 
   return systemPrompt;
 }
-
 
 function calculateTokenCount(conversation_history) {
   const encoding = get_encoding("cl100k_base");
@@ -139,7 +151,11 @@ function calculateTokenCount(conversation_history) {
   return tokens;
 }
 
-async function streamChatCompletion(conversation_history, res, { onUpdate } = {}) {
+async function streamChatCompletion(
+  conversation_history,
+  res,
+  { onUpdate } = {}
+) {
   const openai = getOpenAIInstance();
   const responseStream = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -167,16 +183,15 @@ async function streamChatCompletion(conversation_history, res, { onUpdate } = {}
   }
 }
 
-
-async function saveMessage (conversationId, role, message)  {
+async function saveMessage(conversationId, role, message) {
   if (!conversationId) {
-    throw new Error("CONVERSATION ID is required")
+    throw new Error("CONVERSATION ID is required");
   }
   const query = `
     INSERT INTO messages (conversation_id, role, message)
     VALUES ($1,$2,$3)
     RETURNING id;
-  `
+  `;
   const result = await pool.query(query, [conversationId, role, message]);
   return result.rows[0].id;
 }
@@ -189,5 +204,5 @@ module.exports = {
   doRAG,
   calculateTokenCount,
   streamChatCompletion,
-  saveMessage
+  saveMessage,
 };

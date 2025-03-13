@@ -134,13 +134,13 @@ const Chat = ({
           <div className="input-container">
             <textarea
               className="text-input"
-              placeholder="Type something"
+              placeholder="Tippen Sie etwas"
               onKeyDown={handleKeyPress}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               disabled={isDisabled}
             ></textarea>
-            <div className={isDisabled ? "button send-message disabled":"button send-message"} disabled={isDisabled} onClick={handleSubmit}>Send</div>
+            <div className={isDisabled ? "button send-message disabled":"button send-message"} disabled={isDisabled} onClick={handleSubmit}>Senden</div>
           </div>
         )}
       </div>

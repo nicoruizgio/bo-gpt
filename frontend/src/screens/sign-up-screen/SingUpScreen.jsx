@@ -32,22 +32,22 @@ const SignUpScreen = () => {
       !credentials.password ||
       !credentials.confirmPassword
     ) {
-      setError("All fields are required.");
+      setError("Alle Felder sind erforderlich.");
       setLoading(false);
       return;
     }
     if (credentials.username.length < 3) {
-      setError("Username must be at least 3 characters long.");
+      setError("Der Benutzername muss mindestens 3 Zeichen lang sein.");
       setLoading(false);
       return;
     }
     if (credentials.password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      setError("Das Passwort muss mindestens 6 Zeichen lang sein.");
       setLoading(false);
       return;
     }
     if (credentials.password !== credentials.confirmPassword) {
-      setError("Passwords do not match.");
+      setError("Die Kennwörter stimmen nicht überein.");
       setLoading(false);
       return;
     }
@@ -70,14 +70,14 @@ const SignUpScreen = () => {
     <>
       <HeaderComponent isLoggedIn={false} />
       <div className="screen-container login">
-        <h2>Create New Account</h2>
+        <h2>Neues Konto Erstellen</h2>
         {error && <p className="error-message">{error}</p>}
         <form className="login-form" onSubmit={handleSubmit}>
           <label>
             <input
               type="text"
               className="input"
-              placeholder="Username"
+              placeholder="Benutzername"
               name="username"
               value={credentials.username}
               onChange={handleChange}
@@ -89,7 +89,7 @@ const SignUpScreen = () => {
               type="password"
               className="input"
               name="password"
-              placeholder="Password"
+              placeholder="Passwort"
               value={credentials.password}
               onChange={handleChange}
               required
@@ -100,14 +100,14 @@ const SignUpScreen = () => {
               type="password"
               className="input"
               name="confirmPassword"
-              placeholder="Repeat password"
+              placeholder="Passwort wiederholen"
               value={credentials.confirmPassword}
               onChange={handleChange}
               required
             />
           </label>
           <button className="button login" type="submit" disabled={loading}>
-            {loading ? <div className="spinner"></div> : "Create Account"}
+            {loading ? <div className="spinner"></div> : "Konto erstellen"}
           </button>
         </form>
       </div>

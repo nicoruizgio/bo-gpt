@@ -34,7 +34,7 @@ const HeaderComponent = ({ isLoggedIn, screenName, setChatLog, setConversationId
         <div className="user-info">
           <div className="sing-out-container" onClick={handleSignOut}>
             <span className="material-symbols-outlined">logout</span>
-            <p className="signout-button">Sign out</p>
+            <p className="signout-button">Abmelden</p>
           </div>
 
           <p>|</p>
@@ -52,14 +52,14 @@ const HeaderComponent = ({ isLoggedIn, screenName, setChatLog, setConversationId
         {screenName === "rating_screen" ? (
           <h3 className="sub-title">Rating</h3>
         ) : screenName === "recommender_screen" ? (
-          <h3 className="sub-title">News Recommender</h3>
+          <h3 className="sub-title">Nachrichtenassistentin</h3>
         ) : null}
       </div>
       {
         isLoggedIn && screenName == 'recommender_screen' ? (
           <div className="new-chat">
             <button className="button new-chat-btn" onClick={handleNewChat}>
-              + New Chat
+              + Neuer Chat
               </button>
           </div>
         ) : null
