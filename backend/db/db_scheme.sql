@@ -1,5 +1,3 @@
---- Add pgvector extension
-CREATE EXTENSION vector;
 
 -- Create Participants Table
 CREATE TABLE participants (
@@ -29,28 +27,6 @@ CREATE TABLE questionnaire_responses (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-
--- Old stuff?
-CREATE TABLE news_articles_flexible (
-    id SERIAL PRIMARY KEY,
-    message_id TEXT,
-    title TEXT,
-    sender TEXT,
-    link TEXT,
-    created_date TEXT,
-    text TEXT,
-    image_url TEXT,
-    embedding VECTOR(1536)
-);
-
--- Create chat context (list of news articles to rate and base prompt for rating and recommender screens)
-CREATE TABLE chat_contexts (
-    id SERIAL PRIMARY KEY,
-    screen_name VARCHAR(255) UNIQUE NOT NULL,
-    system_prompt TEXT NOT NULL,
-    news_for_rating TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 -- Create conversations table
 CREATE TABLE conversations (
