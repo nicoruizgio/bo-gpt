@@ -32,10 +32,11 @@ CREATE TABLE questionnaire_responses (
 CREATE TABLE conversations (
   id SERIAL PRIMARY KEY,
   participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+  conversation_type VARCHAR(20) NOT NULL CHECK (conversation_type IN ('rating','recommender')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create message table
+-- Create messages table
 CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
   conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,

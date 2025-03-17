@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import{  useState } from "react";
+import { useState } from "react";
 import ChatMessage from "./chat-message/ChatMessage";
 import { fetchChatCompletion } from "../../api/fetchCompletionApi";
 import "./Chat.css";
 import HeaderComponent from "../header/HeaderComponent";
 import Spinner from "../spinner/Spinner";
-import {createConversation} from "../../api/conversationApi";
+import { createConversation } from "../../api/conversationApi";
 import { saveMessage } from "../../api/saveMessageApi";
 
 const Chat = ({
@@ -16,33 +16,35 @@ const Chat = ({
   handleNext,
   loading,
   conversationId,
-  setConversationId
+  setConversationId,
 }) => {
   const [message, setMessage] = useState("");
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const conversationType =
+    screenName == "recommender_screen" ? "recommender" : "rating";
 
   async function handleSubmit() {
     if (message.trim() === "") return;
 
     let currentConversationId = conversationId;
-    if(!currentConversationId) {
+    if (!currentConversationId) {
       try {
-        const conversation = await createConversation();
-        currentConversationId = conversation.id
+        const conversation = await createConversation({conversationType});
+        currentConversationId = conversation.id;
         setConversationId(conversation.id);
       } catch (error) {
-      console.error("Error creating conversation", error);
-
-      }}
+        console.error("Error creating conversation", error);
+      }
+    }
 
     const userMessage = { id: Date.now(), role: "user", text: message };
 
     const updatedChatLog = [
       ...chatLog,
       userMessage,
-      { id: "ai-stream", role: "ai", text: "" }
+      { id: "ai-stream", role: "ai", text: "" },
     ];
     setChatLog(updatedChatLog);
 
@@ -52,11 +54,9 @@ const Chat = ({
       console.error("Error saving user message: ", error);
     }
 
-
     const parsedMessage = parseInt(message, 10);
 
     const isValidRating = [1, 2, 3, 4, 5].includes(parsedMessage);
-
 
     let newCount = userMessageCount;
     if (maxMessages && isValidRating) {
@@ -68,7 +68,7 @@ const Chat = ({
 
     // Only stop fetching AI response if the valid message limit is reached.
     if (maxMessages && isValidRating && newCount >= maxMessages) {
-      setIsFetching(false)
+      setIsFetching(false);
 
       console.log("User has reached the message limit", newCount);
       return;
@@ -88,7 +88,7 @@ const Chat = ({
             const newLog = prevChatLog.filter((msg) => msg.id !== "ai-stream");
             return [
               ...newLog,
-              { id: "ai-stream", role: "ai", text: currentText }
+              { id: "ai-stream", role: "ai", text: currentText },
             ];
           });
         },
@@ -111,7 +111,6 @@ const Chat = ({
     }
   }
 
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -121,7 +120,12 @@ const Chat = ({
 
   return (
     <section className="chat-area">
-      <HeaderComponent isLoggedIn={true} screenName={screenName} setChatLog={setChatLog} setConversationId={setConversationId} />
+      <HeaderComponent
+        isLoggedIn={true}
+        screenName={screenName}
+        setChatLog={setChatLog}
+        setConversationId={setConversationId}
+      />
       <div className="chat-log">
         <ChatMessage chatLog={chatLog} isFetching={isFetching} />
       </div>
@@ -140,7 +144,17 @@ const Chat = ({
               onChange={(e) => setMessage(e.target.value)}
               disabled={isDisabled}
             ></textarea>
-            <div className={isDisabled ? "button send-message disabled":"button send-message"} disabled={isDisabled} onClick={handleSubmit}>Senden</div>
+            <div
+              className={
+                isDisabled
+                  ? "button send-message disabled"
+                  : "button send-message"
+              }
+              disabled={isDisabled}
+              onClick={handleSubmit}
+            >
+              Senden
+            </div>
           </div>
         )}
       </div>
