@@ -33,6 +33,30 @@ The backend will start running, and you can view logs directly in the terminal.
 
 ---
 
+## Running the Frontend
+
+1. **Open a new terminal** (keeping the backend terminal open) and navigate to the frontend folder:
+
+  ```bash
+  cd frontend
+  ```
+
+2. **Install dependencies** (if you haven’t already):
+
+  ```bash
+  npm install
+  ```
+
+2. **Run the frontend**
+
+  ```bash
+  npm run dev
+  ```
+
+This should start the frontend development server. Follow the console output to see which local port the frontend is being served on.
+
+---
+
 ## Modifying Prompts
 
 Within `backend/src/prompts/`, there are two files:
@@ -93,24 +117,12 @@ This log output helps confirm which pipeline the system is using and also prints
 
 ---
 
-## Running the Frontend
+## Navigating between screens
 
-1. **Open a new terminal** (keeping the backend terminal open) and navigate to the frontend folder:
+In `App.jsx` you can see all the project pages available. Use the urls to navigate between them during testing.
 
-  ```bash
-  cd frontend
-  ```
+---
 
-2. **Install dependencies** (if you haven’t already):
+## Changing the number of news shown in Rating Screen
 
-  ```bash
-  npm install
-  ```
-
-2. **Run the frontend**
-
-  ```bash
-  npm run dev
-  ```
-
-This should start the frontend development server. Follow the console output to see which local port the frontend is being served on.
+The number of news shown by the rating chatbot is set to `36` by default. To change it, go to `frontend/src/screens/rating-screen/RatingScreen.jsx` and search for the prop `MaxMessages={36}`
