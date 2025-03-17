@@ -22,6 +22,7 @@ const HeaderComponent = ({ isLoggedIn, screenName, setChatLog, setConversationId
 
   const handleNewChat = () => {
     localStorage.clear()
+    localStorage.setItem("username", username)
     setConversationId(null);
     setChatLog([
 
