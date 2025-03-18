@@ -86,13 +86,13 @@ You can switch between the **multiquery** and **simple** RAG pipelines by editin
 Inside the function that calls the RAG pipeline, you’ll see something like:
 
   ```bash
-  systemPrompt = await doRAG(chatLog, userId, ragType = 'multiqueryRAG');
+  systemPrompt = await doRAG(chatLog, userId, ragType = 'multiqueryRAG', queryTransformation = true);
   ```
 
 Change 'multiqueryRAG' to 'simpleRAG' to switch to the simple pipeline:
 
   ```bash
-  systemPrompt = await doRAG(chatLog, userId, ragType = 'simpleRAG');
+  systemPrompt = await doRAG(chatLog, userId, ragType = 'simpleRAG',  queryTransformation = true);
   ```
 
 ---
