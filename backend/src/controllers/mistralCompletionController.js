@@ -1,28 +1,13 @@
-import { config } from "dotenv";
-config({ path: require("path").resolve(__dirname, "../../.env") });
+import { Mistral } from '@mistralai/mistralai';
+import "dotenv/config";
 
-if (!process.env.MISTRAL_API_KEY) {
-  throw new Error("❌ MISTRAL_API_KEY is missing! Check your .env file.");
-}
+const apiKey = process.env.MISTRAL_API_KEY;
 
-// Set the key in process.env explicitly before the import
-process.env.MISTRAL_API_KEY = process.env.MISTRAL_API_KEY.trim();
+const client = new Mistral({apiKey: apiKey});
 
-async function getMistralResponse() {
-  const { Mistral } = await import("@mistralai/mistralai");
+const chatResponse = await client.chat.complete({
+  model: 'mistral-large-latest',
+  messages: [{role: 'user', content: 'What is the best French cheese?'}],
+});
 
-  const apiKey = process.env.MISTRAL_API_KEY;
-  console.log("DEBUG: Passing API Key to Mistral:", apiKey);
-
-  const client = new Mistral({ apiKey });
-
-  const mistralResponse = await client.chat.complete({
-    model: "mistral-large-latest",
-    messages: [{ role: "user", content: "What is the best French cheese?" }],
-  });
-
-  console.log("Chat:", mistralResponse.choices[0].message.content);
-  return mistralResponse;
-}
-
-getMistralResponse();
+console.log('Chat:', chatResponse.choices[0].message.content);
