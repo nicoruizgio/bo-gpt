@@ -1,4 +1,4 @@
-const { pool } = require("../config/db");
+import pool from "../config/db.js";
 
 /* Insert new conversation record in DB */
 const createConversation = async (req, res) => {
@@ -8,8 +8,7 @@ const createConversation = async (req, res) => {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-
-     const { conversationType } = req.body;
+    const { conversationType } = req.body;
 
     // Validate the conversationTYpe
     if (!["rating", "recommender"].includes(conversationType)) {
@@ -31,4 +30,4 @@ const createConversation = async (req, res) => {
   }
 };
 
-module.exports = { createConversation };
+export default createConversation;

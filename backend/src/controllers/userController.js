@@ -1,6 +1,7 @@
-const { pool } = require("../config/db");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import pool from "../config/db.js";
+import { hash, compare } from "bcrypt";
+import pkg from 'jsonwebtoken';
+const { sign } = pkg;
 
 /* Logic for user registration, log in and log out*/
 
@@ -19,7 +20,7 @@ const registerUser = async (req, res) => {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hash(password, 10);
 
     // Insert user into database
     const result = await pool.query(
@@ -30,7 +31,7 @@ const registerUser = async (req, res) => {
     const userId = result.rows[0].id;
 
     // Generate JWT token
-    const token = jwt.sign(
+    const token = sign(
       { id: userId, username: username },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
@@ -60,13 +61,13 @@ const loginUser = async (req, res) => {
     const user = userCheck.rows[0];
 
     // Compare the hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid username or password." });
     }
 
     // Generate JWT token
-    const token = jwt.sign(
+    const token = sign(
       { id: user.id, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
@@ -99,5 +100,4 @@ const logoutUser = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
-// Ensure both functions are exported correctly
-module.exports = { registerUser, loginUser, logoutUser };
+export default { registerUser, loginUser, logoutUser };

@@ -1,8 +1,8 @@
-const express = require("express");
-const { checkAuth } = require("../controllers/authVerificationController");
+import { Router } from "express";
+import checkAuth from "../controllers/authVerificationController.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/check-auth", checkAuth);
 
-module.exports = router;
+export default router;

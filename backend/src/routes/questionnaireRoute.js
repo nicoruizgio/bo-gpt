@@ -1,8 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const {saveQuestionnaireResponse} = require("../controllers/questionnaireController");
-const authMiddleware = require("../middleware/authMiddleware");
+import { Router } from "express";
+const router = Router();
+import saveQuestionnaireResponse from "../controllers/questionnaireController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 router.post("/questionnaire", authMiddleware, saveQuestionnaireResponse);
 
-module.exports = router;
+export default router;

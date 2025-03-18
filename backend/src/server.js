@@ -1,25 +1,30 @@
-require("dotenv").config({
-  path:
-    process.env.NODE_ENV === "production"
-      ? ".env.production"
-      : ".env.development",
-});
+import "dotenv/config";
+
+const envFile =
+  process.env.NODE_ENV === "production"
+    ? ".env.production"
+    : ".env.development";
+
+import dotenv from "dotenv";
+dotenv.config({ path: envFile });
+
 
 console.log("Loaded ENV Variables:");
 console.log("POSTGRES_HOST:", process.env.POSTGRES_HOST);
 console.log("POSTGRES_USER:", process.env.POSTGRES_USER);
 console.log("POSTGRES_DB:", process.env.POSTGRES_DB);
 
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const completionRoutes = require("./routes/completionRoutes");
-const userRoutes = require("./routes/userRoutes");
-const authVerificationRoute = require("./routes/authVerificationRoute");
-const questionnaireRoute = require("./routes/questionnaireRoute");
-const conversationRoute = require("./routes/conversationRoutes");
-const saveMessageRoute = require("./routes/saveMessageRoute")
+import express from "express";
+import pkg from 'body-parser';
+const { json } = pkg;
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import completionRoutes from "./routes/completionRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import authVerificationRoute from "./routes/authVerificationRoute.js";
+import questionnaireRoute from "./routes/questionnaireRoute.js";
+import conversationRoute from "./routes/conversationRoutes.js";
+import saveMessageRoute from "./routes/saveMessageRoute.js";
 
 const app = express();
 
@@ -33,7 +38,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(bodyParser.json());
+app.use(json());
 
 app.use("/api", completionRoutes);
 app.use("/api", userRoutes);

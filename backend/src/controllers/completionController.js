@@ -1,5 +1,6 @@
-const { pool } = require("../config/db");
-const {
+import pool from "../config/db.js";
+
+import {
   getUserPreferences,
   generateEmbedding,
   vectorSearch,
@@ -8,9 +9,13 @@ const {
   calculateTokenCount,
   streamChatCompletion,
   saveMessage,
-} = require("../helpers/completionHelpers");
-const { rating_screen_prompt} = require("../prompts/prompts")
-const { getOpenAIInstance } = require("../config/openai");
+} from "../helpers/completionHelpers.js";
+
+import prompts from "../prompts/prompts.js";
+
+const { rating_screen_prompt } = prompts;
+
+import { getOpenAIInstance } from "../config/openai.js";
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
@@ -27,17 +32,24 @@ const getCompletion = async (req, res) => {
 
     // Recommender Screen Logic
     if (screenName === "recommender_screen") {
-      systemPrompt = await doRAG(chatLog, userId, ragType = 'simpleRAG', queryTransformation = true)
+      systemPrompt = await doRAG(
+        chatLog,
+        userId,
+        "simpleRAG",
+         true
+      );
     }
 
     // Rating Screen Logic
     else if (screenName === "rating_screen") {
-      systemPrompt = rating_screen_prompt
+      systemPrompt = rating_screen_prompt;
     }
 
-
     // Construct conversation history
-    const conversation_history = createConversationHistory(chatLog, systemPrompt);
+    const conversation_history = createConversationHistory(
+      chatLog,
+      systemPrompt
+    );
 
     // Calculate and log token count
     const tokens = calculateTokenCount(conversation_history);
@@ -60,7 +72,6 @@ const getCompletion = async (req, res) => {
 
     // Save AI response in database
     await saveMessage(conversationId, "ai", finalAiMessage);
-
   } catch (error) {
     console.error("Error in getCompletion:", error);
     if (!res.headersSent) {
@@ -69,4 +80,4 @@ const getCompletion = async (req, res) => {
   }
 };
 
-module.exports = { getCompletion };
+export default getCompletion;

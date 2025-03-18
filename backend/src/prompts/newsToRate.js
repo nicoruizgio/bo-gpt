@@ -178,6 +178,6 @@ Label: Wissenschaft / Technologie (NOTREGIONAL)
 Unter GrÃ¶nlands-Eis: Nasa macht Ã¼berraschenden Fund
 Bei einem Testflug haben Wissenschaftler die â€žStadt unter dem Eisâ€œ wiederentdeckt. Warum das geheime US-Lager zur Gefahr werden kÃ¶nnte.
 Mehr Infos: https://www.waz.de/panorama/article407779530/unter-groenlands-eis-nasa-macht-ueberraschenden-fund.html
-`
+`;
 
-module.exports = newsToRate;
+export default { newsToRate };

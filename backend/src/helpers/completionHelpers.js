@@ -1,11 +1,13 @@
-const { getOpenAIInstance } = require("../config/openai");
-const { get_encoding } = require("tiktoken");
+import { getOpenAIInstance } from "../config/openai.js";
+import { get_encoding } from "tiktoken";
+import prompts from "../prompts/prompts.js";
+
 const {
   recommender_screen_multiquery_prompt,
   recommender_screen_simple_prompt,
   query_transformation_prompt,
-} = require("../prompts/prompts");
-const { pool } = require("../config/db");
+} = prompts;
+import pool from "../config/db.js";
 
 function getCurrentTimestamp() {
   return Date.now();
@@ -231,7 +233,7 @@ async function saveMessage(conversationId, role, message) {
   return result.rows[0].id;
 }
 
-module.exports = {
+export {
   getUserPreferences,
   generateEmbedding,
   vectorSearch,

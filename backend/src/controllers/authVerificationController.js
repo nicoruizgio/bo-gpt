@@ -1,9 +1,10 @@
 /* Authentication Controller */
 
-const jwt = require("jsonwebtoken");
+import pkg from "jsonwebtoken";
+const { verify } = pkg;
 
 const verifyToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET);
+  return verify(token, process.env.JWT_SECRET);
 };
 
 const checkAuth = (req, res) => {
@@ -23,4 +24,4 @@ const checkAuth = (req, res) => {
   }
 };
 
-module.exports = { checkAuth };
+export default checkAuth;

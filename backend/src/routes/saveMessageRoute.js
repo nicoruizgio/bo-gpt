@@ -1,8 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const {saveMessageController} = require("../controllers/saveMessageController");
-const authMiddleware = require("../middleware/authMiddleware");
+import { Router } from "express";
+const router = Router();
+import saveMessageController from "../controllers/saveMessageController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 router.post("/save-message", authMiddleware, saveMessageController);
 
-module.exports = router
+export default router;

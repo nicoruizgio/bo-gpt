@@ -1,7 +1,10 @@
-const { pool } = require("../config/db");
-const { getOpenAIInstance } = require("../config/openai");
-const { get_user_preferences_prompt } = require("../prompts/prompts");
-const { get_encoding } = require("tiktoken");
+import pool from "../config/db.js";
+import { getOpenAIInstance } from "../config/openai.js";
+
+import prompts from "../prompts/prompts.js";
+const { get_user_preferences_prompt } = prompts;
+
+import { get_encoding } from "tiktoken";
 
 /* Save user rating summaru (user preferences) in DB */
 const saveRatingSummary = async (req, res) => {
@@ -25,7 +28,7 @@ const saveRatingSummary = async (req, res) => {
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: get_user_preferences_prompt},
+        { role: "system", content: get_user_preferences_prompt },
         { role: "user", content: conversation },
       ],
     });
@@ -70,4 +73,4 @@ const saveRatingSummary = async (req, res) => {
   }
 };
 
-module.exports = { saveRatingSummary };
+export default saveRatingSummary;

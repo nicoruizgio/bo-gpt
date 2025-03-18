@@ -1,13 +1,9 @@
-require("dotenv").config();
-const { OpenAI } = require("openai");
+import { OpenAI } from "openai";
+import "dotenv/config";
 
-
-const getOpenAIInstance = (useOpenRouter) => {
+export function getOpenAIInstance(useOpenRouter) {
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
     baseURL: "https://api.openai.com/v1",
   });
-};
-
-
-module.exports = { getOpenAIInstance};
+}

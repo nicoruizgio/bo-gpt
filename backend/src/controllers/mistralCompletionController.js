@@ -1,5 +1,5 @@
-const dotenv = require("dotenv");
-dotenv.config({ path: require("path").resolve(__dirname, "../../.env") });
+import { config } from "dotenv";
+config({ path: require("path").resolve(__dirname, "../../.env") });
 
 if (!process.env.MISTRAL_API_KEY) {
   throw new Error("❌ MISTRAL_API_KEY is missing! Check your .env file.");

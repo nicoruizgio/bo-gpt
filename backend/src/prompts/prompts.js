@@ -1,4 +1,4 @@
-const newsToRate = require("./newsToRate");
+import newsToRate from "./newsToRate.js";
 
 const rating_screen_prompt = `
 This GPT sequentially presents news articles to the user. Each of the 54 articles is presented in English and includes a title, a brief summary (1-2 sentences), and a source link.
@@ -174,7 +174,7 @@ const query_transformation_prompt = `System-Prompt: Query-Transformation für di
 
 Ursprüngliche Abfrage:`
 
-module.exports = {
+export default {
   rating_screen_prompt,
   get_user_preferences_prompt,
   recommender_screen_multiquery_prompt,

@@ -1,14 +1,15 @@
-const { Pool } = require("pg");
-const dotenv = require("dotenv");
+import pkg from "pg";
+import { config } from "dotenv";
+
+const { Pool } = pkg;
 
 // Load the correct environment file
-dotenv.config({
+config({
   path:
     process.env.NODE_ENV === "production"
       ? ".env.production"
       : ".env.development",
 });
-
 
 // Postgres connection
 const pool = new Pool({
@@ -21,4 +22,4 @@ const pool = new Pool({
 
 console.log(`Connected to PostgreSQL on ${process.env.POSTGRES_HOST}`);
 
-module.exports = {pool};
+export default pool;

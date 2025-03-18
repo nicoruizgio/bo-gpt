@@ -1,4 +1,5 @@
-const jwt = require("jsonwebtoken");
+import pkg from 'jsonwebtoken';
+const { verify } = pkg;
 
 const atuhMiddleware = (req, res, next) => {
   const token = req.cookies.token;
@@ -10,7 +11,7 @@ const atuhMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token
+    const decoded = verify(token, process.env.JWT_SECRET); // Verify token
     req.user = { id: decoded.id }; // Attach participant ID to request
     next(); // Continue to the next middleware or route handler
   } catch (error) {
@@ -18,4 +19,4 @@ const atuhMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = atuhMiddleware;
+export default atuhMiddleware;

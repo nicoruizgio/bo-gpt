@@ -44,7 +44,7 @@ const RatingScreen = () => {
         screenName={"rating_screen"}
         chatLog={chatLog}
         setChatLog={setChatLog}
-        maxMessages={36}
+        maxMessages={2}
         handleNext={handleNext}
         loading={loading}
         conversationId={conversationId}
