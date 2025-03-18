@@ -9,8 +9,9 @@ This project is divided into two main folders: `backend` and `frontend`. Below, 
 1. [Running the Backend](#running-the-backend)
 2. [Modifying Prompts](#modifying-prompts)
 3. [Toggling Between RAG Pipelines](#toggling-between-rag-pipelines)
-4. [Viewing Logs](#viewing-logs)
-5. [Running the Frontend](#running-the-frontend)
+4. [Using Query Transformations](#using-query-transformations)
+5. [Viewing Logs](#viewing-logs)
+6. [Running the Frontend](#running-the-frontend)
 
 ---
 
@@ -70,6 +71,7 @@ All chatbot prompts are defined in `prompts.js`, including:
 - `get_user_preferences_prompt`: Used to generate the user preference summary based on the conversation with the rating bot.
 - `recommender_screen_multiquery_prompt`: Used by the recommender chatbot that employs a multi-query RAG pipeline.
 - `recommender_screen_simple_prompt`: Used by the recommender chatbot that employs a simple RAG pipeline.
+- `query_transformation_prompt`: Used to enhance user message
 
 Feel free to adjust these prompts to experiment with different chatbot behaviors.
 
@@ -95,25 +97,24 @@ Change 'multiqueryRAG' to 'simpleRAG' to switch to the simple pipeline:
 
 ---
 
+## Using Query Transformations
+
+To improve the retrieved articles, we can enhance user messages by adding more details and extra information to the query ([read more](https://github.com/NirDiamant/RAG_Techniques/blob/main/all_rag_techniques/query_transformations.ipynb)). To use this feature set `queryTransformation = true` in `backend/src/controllers/completionControllers.js`. To use the user message to query the database without doing query transformation change it to `queryTransformation = fasle`.
+
+---
+
 ## Viewing Logs
 
-While the backend is running, whenever you interact with the recommender chatbot, you can check the terminal output. You should see lines like:
+While the backend is running, whenever you interact with the recommender chatbot, you can check the terminal output and see the transformed query (if activated), the user message and the RAG type being used along with the entire system prompt. You should see lines like:
 
   ```bash
-    RAG TYPE: MULTIQUERY
-  ..
-  <system prompt details>
-  ```
 
-or
-
- ```bash
+    USER MESSAGE:  fussball
+    TRANSFORMED QUERY:  Fußballspiele und Vereinsentwicklungen in Bochum und der Bundesliga.
     RAG TYPE: SIMPLE
   ..
   <system prompt details>
   ```
-
-This log output helps confirm which pipeline the system is using and also prints out the exact system prompts (which include the relevant text retrieved from articles).
 
 ---
 
