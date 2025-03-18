@@ -86,20 +86,20 @@ You can switch between the **multiquery** and **simple** RAG pipelines by editin
 Inside the function that calls the RAG pipeline, you’ll see something like:
 
   ```bash
-  systemPrompt = await doRAG(chatLog, userId, ragType = 'multiqueryRAG', queryTransformation = true);
+  systemPrompt = await doRAG(chatLog, userId, 'multiqueryRAG', true);
   ```
 
 Change 'multiqueryRAG' to 'simpleRAG' to switch to the simple pipeline:
 
   ```bash
-  systemPrompt = await doRAG(chatLog, userId, ragType = 'simpleRAG',  queryTransformation = true);
+  systemPrompt = await doRAG(chatLog, userId, 'simpleRAG', true);
   ```
 
 ---
 
 ## Using Query Transformations
 
-To improve the retrieved articles, we can enhance user messages by adding more details and extra information to the query ([read more](https://github.com/NirDiamant/RAG_Techniques/blob/main/all_rag_techniques/query_transformations.ipynb)). To use this feature set `queryTransformation = true` in `backend/src/controllers/completionControllers.js`. To use the user message to query the database without doing query transformation change it to `queryTransformation = fasle`.
+To improve the retrieved articles, we can enhance user messages by adding more details and extra information to the query ([read more](https://github.com/NirDiamant/RAG_Techniques/blob/main/all_rag_techniques/query_transformations.ipynb)). To use this feature set the fourth argument of `doRAG` to `true` in `backend/src/controllers/completionControllers.js`. To use the user message to query the database without doing query transformation change it to `fasle`.
 
 ---
 
