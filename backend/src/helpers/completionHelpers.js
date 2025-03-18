@@ -3,11 +3,34 @@ const { get_encoding } = require("tiktoken");
 const {
   recommender_screen_multiquery_prompt,
   recommender_screen_simple_prompt,
+  query_transformation_prompt,
 } = require("../prompts/prompts");
 const { pool } = require("../config/db");
 
 function getCurrentTimestamp() {
   return Date.now();
+}
+
+// Function to transform the user's query using OpenAI
+async function transformQuery(userMessage) {
+  try {
+    const openai = getOpenAIInstance();
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: ` ${query_transformation_prompt} ${userMessage}`,
+        },
+        { role: "user", content: userMessage },
+      ],
+    });
+
+    return response?.choices?.[0]?.message?.content || null;
+  } catch (error) {
+    console.error("Error during query transformation: ", error);
+    return null;
+  }
 }
 
 async function getUserPreferences(sqlQuery, userId) {
@@ -21,7 +44,6 @@ async function getUserPreferences(sqlQuery, userId) {
 }
 
 async function generateEmbedding(text) {
-  console.log("TEXT TO EMBEDDING: ", text);
   const openai = getOpenAIInstance();
   const embeddingResponse = await openai.embeddings.create({
     model: "text-embedding-ada-002",
@@ -58,7 +80,7 @@ function createConversationHistory(chatLog, updatedSystemPrompt) {
   ];
 }
 
-async function doRAG(chatLog, userId, ragType) {
+async function doRAG(chatLog, userId, ragType, queryTransformation) {
   // SQL queries for retrieving articles and user preferences
   const articleSqlQuery = `
     SELECT id, title, summary, link, published_unix
@@ -80,12 +102,25 @@ async function doRAG(chatLog, userId, ragType) {
   const userMessage =
     chatLog.filter((msg) => msg.role === "user").pop()?.text || null;
 
+  console.log("\n \n", "USER MESSAGE: ", userMessage);
+
   // Retrieve user preferences from the database
   const userPreferences = await getUserPreferences(userSqlQuery, userId);
 
+  // Transform the query if needed
+  const transformedQuery =
+    queryTransformation === true && userMessage
+      ? await transformQuery(userMessage)
+      : null;
+
+  console.log("TRANSFORMED QUERY: ", transformedQuery);
+
+  // Determine the final query to use for embeddings
+  const finalQuery = transformedQuery || userMessage;
+
   // Generate embedding and retrieve articles based on the latest user message
-  const userMessageEmbedding = userMessage
-    ? await generateEmbedding(userMessage)
+  const userMessageEmbedding = finalQuery
+    ? await generateEmbedding(finalQuery)
     : null;
   const userMessageArticles = userMessageEmbedding
     ? await vectorSearch(userMessageEmbedding, articleSqlQuery)
@@ -117,7 +152,7 @@ async function doRAG(chatLog, userId, ragType) {
   } else if (ragType === "simpleRAG") {
     // Create a simpler context only based on the user query
     context = `
-    *** Todays date: ${getCurrentTimestamp}
+    *** Todays date: ${getCurrentTimestamp()} ***
     ***Retrieved Articles:***
     ${userMessageArticles}
     `;

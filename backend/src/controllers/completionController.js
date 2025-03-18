@@ -10,6 +10,7 @@ const {
   saveMessage,
 } = require("../helpers/completionHelpers");
 const { rating_screen_prompt} = require("../prompts/prompts")
+const { getOpenAIInstance } = require("../config/openai");
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
@@ -26,7 +27,7 @@ const getCompletion = async (req, res) => {
 
     // Recommender Screen Logic
     if (screenName === "recommender_screen") {
-      systemPrompt = await doRAG(chatLog, userId, ragType = 'simpleRAG')
+      systemPrompt = await doRAG(chatLog, userId, ragType = 'simpleRAG', queryTransformation = true)
     }
 
     // Rating Screen Logic
