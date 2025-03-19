@@ -1,4 +1,4 @@
-# Project README
+# Bo-GPT README
 
 This project is divided into two main folders: `backend` and `frontend`. Below, you’ll find instructions on how to run both, as well as how to modify certain parameters (such as prompts and the RAG pipeline type).
 
@@ -7,11 +7,14 @@ This project is divided into two main folders: `backend` and `frontend`. Below, 
 ## Table of Contents
 
 1. [Running the Backend](#running-the-backend)
-2. [Modifying Prompts](#modifying-prompts)
-3. [Toggling Between RAG Pipelines](#toggling-between-rag-pipelines)
-4. [Using Query Transformations](#using-query-transformations)
-5. [Viewing Logs](#viewing-logs)
-6. [Running the Frontend](#running-the-frontend)
+2. [Running the Fronted](#running-the-frontend)
+3. [Switching Between OpenAI Models](#switching-between-openai-models)
+4. [Modifying Prompts](#modifying-prompts)
+5. [MultiqueryRAG vs SimpleRAG](#multiqueryrag-vs-simplerag)
+6. [Toggling Between RAG Pipelines](#toggling-between-rag-pipelines)
+7. [Using Query Transformations](#using-query-transformations)
+8. [Viewing Logs](#viewing-logs)
+9. [Running the Frontend](#running-the-frontend)
 
 ---
 
@@ -58,6 +61,28 @@ This should start the frontend development server. Follow the console output to 
 
 ---
 
+## Switching Between OpenAI Models
+
+To modify the OpenAI models used in different parts of the system, update the relevant files as follows:
+
+- **User Preferences Summary Model**
+  Navigate to `backend/src/controllers/controllers/saveRatingController.js` and modify the `model` field inside `response`:
+  ```js
+  model: "gpt-4o"
+  ```
+
+- **Rating and Recommender Chatbot Model**
+  Go to `backend/src/helpers/completionHelpers` and update the `model` field inside the `async function streamChatCompletion`:
+  ```js
+  model: "gpt-4o"
+  ```
+
+- **Query Transformation Model**
+  In `backend/src/helpers/completionHelpers`, modify the `model` field inside `async function transformQuery`:
+  ```js
+  model: "gpt-4o"
+  ```
+
 ## Modifying Prompts
 
 Within `backend/src/prompts/`, there are two files:
@@ -74,6 +99,16 @@ All chatbot prompts are defined in `prompts.js`, including:
 - `query_transformation_prompt`: Used to enhance user message
 
 Feel free to adjust these prompts to experiment with different chatbot behaviors.
+
+---
+
+## MultiqueryRAG vs SimpleRAG
+
+Bo-GPT supports both **multiquery** and **simple** RAG pipelines.
+
+- The **multiquery** pipeline retrieves two sets of articles, both embedded in the model’s context window. One set is based on the user’s message, while the other is based on the user’s preferences. Then, the system decides which articles to recommend based on both sets. The system prompt for this pipeline is defined in `recommender_screen_multiquery_prompt`.
+
+- The **simple** RAG pipeline queries the database using only the user’s message, while the user’s preferences are directly embedded into the model’s context window. Here, the system takes into account the user preferences to determine which articles to recommend from the retrieved set. The system prompt for this pipeline is defined in `recommender_screen_simple_prompt`.
 
 ---
 

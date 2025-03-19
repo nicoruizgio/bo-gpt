@@ -195,7 +195,7 @@ async function streamChatCompletion(
 ) {
   const openai = getOpenAIInstance();
   const responseStream = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o",
     stream: true,
     messages: conversation_history,
   });
