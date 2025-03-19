@@ -223,6 +223,7 @@ async function doRAG(
       ***Retrieved Articles:***
       ${userMessageArticles}
       `;
+
       systemPrompt = `
       ${recommender_screen_simple_prompt}
       ${context}
