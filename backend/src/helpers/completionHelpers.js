@@ -1,6 +1,10 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatMistralAI } from "@langchain/mistralai";
-import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
+import {
+  SystemMessage,
+  HumanMessage,
+  AIMessage,
+} from "@langchain/core/messages";
 import { get_encoding } from "tiktoken";
 import prompts from "../prompts/prompts.js";
 import { getOpenAIInstance } from "../config/openai.js";
@@ -9,34 +13,33 @@ import pool from "../config/db.js";
 const {
   recommender_screen_multiquery_prompt,
   recommender_screen_simple_prompt,
+  recommender_screen_mistral_prompt,
   query_transformation_prompt,
-  rating_screen_prompt,
 } = prompts;
 
 function getCurrentTimestamp() {
   return Date.now();
 }
 
-// Unified function to create a chat model instance based on the provider.
 function getChatModel(provider) {
   if (provider === "openai") {
+    console.log("PROVIDER: OPEN AI ");
     return new ChatOpenAI({
       model: "gpt-4o",
-      temperature:  0,
+      temperature: 0,
       streaming: true,
     });
   } else if (provider === "mistral") {
-    // ChatMistral should implement the same interface as ChatOpenAI.
+    console.log("PROVIDER: MISTRAL");
     return new ChatMistralAI({
-      model: "mistral-large-latest", // Adjust to your Mistral model identifier
-      temperature:  0,
+      model: "mistral-large-latest", // Change here mistral model
+      temperature: 0,
       streaming: true,
     });
   }
   throw new Error(`Unknown provider: ${provider}`);
 }
 
-// Transform the user's query using the selected provider
 async function transformQuery(userMessage, provider = "openai") {
   try {
     const model = getChatModel(provider);
@@ -44,7 +47,7 @@ async function transformQuery(userMessage, provider = "openai") {
       new SystemMessage(`${query_transformation_prompt} ${userMessage}`),
       new HumanMessage(userMessage),
     ]);
-    // Return the content of the AIMessage response.
+
     return transformed.content;
   } catch (error) {
     console.error("Error during query transformation: ", error);
@@ -87,13 +90,29 @@ async function vectorSearch(embedding, sqlQuery) {
   return retrievedArticles;
 }
 
-// Build conversation history using LangChain message classes.
+async function getRecentArticles(days) {
+  const query = `
+    SELECT title, link, summary, published_unix
+    FROM rss_embeddings
+    WHERE published_unix >= EXTRACT(EPOCH FROM NOW()) - (86400 * $1)
+    ORDER BY published_unix DESC;
+  `;
+
+  try {
+    const result = await pool.query(query, [days]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching recent articles:", error);
+    throw error;
+  }
+}
+
 function createConversationHistory(chatLog, updatedSystemPrompt) {
   const history = [];
   history.push(new SystemMessage(updatedSystemPrompt));
-  // Filter out any trailing assistant messages so the last message is from the user.
+  // filter out any trailing assistant messages so the last message is from the user.
   const filteredLog = chatLog.filter((msg, index) => {
-    // If it's the last message and its role is assistant, remove it.
+    // if it's the last message and its role is assistant, remove it.
     if (index === chatLog.length - 1 && msg.role === "ai") {
       return false;
     }
@@ -106,12 +125,17 @@ function createConversationHistory(chatLog, updatedSystemPrompt) {
       history.push(new AIMessage(msg.text));
     }
   });
-  // Optionally, if you need to prompt the model, you could append a new empty user message.
   history.push(new HumanMessage(""));
   return history;
 }
 
-async function doRAG(chatLog, userId, ragType, queryTransformation, provider = "openai") {
+async function doRAG(
+  chatLog,
+  userId,
+  ragType,
+  queryTransformation,
+  provider = "openai"
+) {
   // SQL queries for retrieving articles and user preferences
   const articleSqlQuery = `
     SELECT id, title, summary, link, published_unix
@@ -149,40 +173,71 @@ async function doRAG(chatLog, userId, ragType, queryTransformation, provider = "
   let systemPrompt = "";
   let context = "";
 
-  if (ragType === "multiqueryRAG") {
-    const userPreferencesEmbedding = userPreferences
-      ? await generateEmbedding(userPreferences)
-      : null;
-    const userPreferencesArticles = userPreferencesEmbedding
-      ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery)
-      : "";
-    context = `
-    ***Articles Relevant for User Message:***
-    ${userMessageArticles}
+  if (provider === "mistral") {
+    const articles = await getRecentArticles(1);
+    const formattedArticles = articles
+      .map(
+        (article) =>
+          `**${article.title}**\n${article.summary}\n[Link](${
+            article.link
+          })\nDatum: ${new Date(
+            article.published_unix * 1000
+          ).toLocaleDateString("de-DE")}`
+      )
+      .join("\n\n");
 
-    ***Articles Relevant for User Preferences:***
-    ${userPreferencesArticles}`;
-    systemPrompt = `
-    ${recommender_screen_multiquery_prompt}
-    ${context}`;
-  } else if (ragType === "simpleRAG") {
     context = `
-    *** Today's date: ${getCurrentTimestamp()} ***
-    ***Retrieved Articles:***
-    ${userMessageArticles}
-    `;
-    systemPrompt = `
-    ${recommender_screen_simple_prompt}
-    ${context}
-
     ***User Preferences***
     ${userPreferences}
+
+    *** Today's date: ${getCurrentTimestamp()} ***
+
+    ***List of Articles:***
+    ${formattedArticles}
+    `;
+    systemPrompt = `
+    ${recommender_screen_mistral_prompt}
+    ${context}
     `;
   } else {
-    console.error(`Unknown RAG type: ${ragType}`);
-    throw new Error(`Unsupported ragType: ${ragType}`);
+    if (ragType === "multiqueryRAG") {
+      const userPreferencesEmbedding = userPreferences
+        ? await generateEmbedding(userPreferences)
+        : null;
+      const userPreferencesArticles = userPreferencesEmbedding
+        ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery)
+        : "";
+      context = `
+      *** Today's date: ${getCurrentTimestamp()} ***
+      ***Articles Relevant for User Message:***
+      ${userMessageArticles}
+
+      ***Articles Relevant for User Preferences:***
+      ${userPreferencesArticles}`;
+      systemPrompt = `
+      ${recommender_screen_multiquery_prompt}
+      ${context}`;
+    } else if (ragType === "simpleRAG") {
+      context = `
+      *** Today's date: ${getCurrentTimestamp()} ***
+      ***Retrieved Articles:***
+      ${userMessageArticles}
+      `;
+      systemPrompt = `
+      ${recommender_screen_simple_prompt}
+      ${context}
+
+      ***User Preferences***
+      ${userPreferences}
+      `;
+    } else {
+      console.error(`Unknown RAG type: ${ragType}`);
+      throw new Error(`Unsupported ragType: ${ragType}`);
+    }
+    console.log(
+      `RAG TYPE: ${ragType === "multiqueryRAG" ? "MULTIQUERY" : "SIMPLE"}`
+    );
   }
-  console.log(`RAG TYPE: ${ragType === "multiqueryRAG" ? "MULTIQUERY" : "SIMPLE"}`);
   console.log(systemPrompt);
   return systemPrompt;
 }
@@ -197,7 +252,12 @@ function calculateTokenCount(conversation_history) {
 }
 
 // Stream chat completion using the unified message format.
-async function streamChatCompletion(conversation_history, res, { onUpdate } = {}, provider) {
+async function streamChatCompletion(
+  conversation_history,
+  res,
+  { onUpdate } = {},
+  provider
+) {
   const model = getChatModel(provider);
   try {
     const stream = await model.stream(conversation_history);
@@ -240,4 +300,3 @@ export {
   streamChatCompletion,
   saveMessage,
 };
-

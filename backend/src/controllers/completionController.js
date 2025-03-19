@@ -1,9 +1,4 @@
-import pool from "../config/db.js";
-
 import {
-  getUserPreferences,
-  generateEmbedding,
-  vectorSearch,
   createConversationHistory,
   doRAG,
   calculateTokenCount,
@@ -15,9 +10,7 @@ import prompts from "../prompts/prompts.js";
 
 const { rating_screen_prompt } = prompts;
 
-import { getOpenAIInstance } from "../config/openai.js";
-
-const provider = 'mistral';
+const provider = "openai"; // change here between 'openai' and 'mistral'
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
@@ -61,11 +54,16 @@ const getCompletion = async (req, res) => {
     let finalAiMessage = "";
 
     // Stream AI response
-    await streamChatCompletion(conversation_history, res, {
-      onUpdate: (partial) => {
-        finalAiMessage += partial;
+    await streamChatCompletion(
+      conversation_history,
+      res,
+      {
+        onUpdate: (partial) => {
+          finalAiMessage += partial;
+        },
       },
-    }, provider);
+      provider
+    );
 
     // Save AI response in database
     await saveMessage(conversationId, "ai", finalAiMessage);
