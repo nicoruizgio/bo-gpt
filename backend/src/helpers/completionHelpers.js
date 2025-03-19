@@ -1,4 +1,5 @@
 import { getOpenAIInstance } from "../config/openai.js";
+import { ChatOpenAI } from "@langchain/openai";
 import { get_encoding } from "tiktoken";
 import prompts from "../prompts/prompts.js";
 
@@ -16,19 +17,21 @@ function getCurrentTimestamp() {
 // Function to transform the user's query using OpenAI
 async function transformQuery(userMessage) {
   try {
-    const openai = getOpenAIInstance();
-    const response = await openai.chat.completions.create({
+    const model = new ChatOpenAI({
       model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: ` ${query_transformation_prompt} ${userMessage}`,
-        },
-        { role: "user", content: userMessage },
-      ],
+      temperature: 0,
     });
 
-    return response?.choices?.[0]?.message?.content || null;
+    const transformed = await model.call([
+      {
+        role: "system",
+        content: `${query_transformation_prompt} ${userMessage}`,
+      },
+      { role: "user", content: userMessage },
+    ]);
+
+    // Ensure we return a string.
+    return typeof transformed === "string" ? transformed : transformed.content;
   } catch (error) {
     console.error("Error during query transformation: ", error);
     return null;
@@ -193,27 +196,29 @@ async function streamChatCompletion(
   res,
   { onUpdate } = {}
 ) {
-  const openai = getOpenAIInstance();
-  const responseStream = await openai.chat.completions.create({
-    model: "gpt-4o",
-    stream: true,
-    messages: conversation_history,
+  // Create a ChatOpenAI instance with streaming enabled.
+  const model = new ChatOpenAI({
+    model: "gpt-4o", // adjust as needed
+    temperature: 0,
+    streaming: true,
   });
 
   try {
-    for await (const chunk of responseStream) {
-      if (chunk.choices[0].finish_reason === "stop") {
-        break;
-      }
-      const text = chunk.choices[0].delta?.content;
+    // The stream() method accepts the conversation history (an array of messages)
+    // and returns an async iterator over response chunks.
+    const stream = await model.stream(conversation_history);
+
+    for await (const chunk of stream) {
+      // Each chunk is expected to have a "content" property.
+      const text = chunk.content;
       if (text) {
         res.write(text);
         if (onUpdate) onUpdate(text);
         if (res.flush) res.flush();
       }
     }
-  } catch (streamError) {
-    console.error("Error during OpenAI stream:", streamError);
+  } catch (error) {
+    console.error("Error during streaming:", error);
     res.write("\n[Error occurred in AI response]");
   } finally {
     res.end();

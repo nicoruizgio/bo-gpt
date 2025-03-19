@@ -32,12 +32,7 @@ const getCompletion = async (req, res) => {
 
     // Recommender Screen Logic
     if (screenName === "recommender_screen") {
-      systemPrompt = await doRAG(
-        chatLog,
-        userId,
-        "simpleRAG",
-         true
-      );
+      systemPrompt = await doRAG(chatLog, userId, "simpleRAG", true);
     }
 
     // Rating Screen Logic
