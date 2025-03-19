@@ -17,6 +17,8 @@ const { rating_screen_prompt } = prompts;
 
 import { getOpenAIInstance } from "../config/openai.js";
 
+const provider = 'mistral';
+
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
   try {
@@ -32,7 +34,7 @@ const getCompletion = async (req, res) => {
 
     // Recommender Screen Logic
     if (screenName === "recommender_screen") {
-      systemPrompt = await doRAG(chatLog, userId, "simpleRAG", true);
+      systemPrompt = await doRAG(chatLog, userId, "simpleRAG", true, provider);
     }
 
     // Rating Screen Logic
@@ -63,7 +65,7 @@ const getCompletion = async (req, res) => {
       onUpdate: (partial) => {
         finalAiMessage += partial;
       },
-    });
+    }, provider);
 
     // Save AI response in database
     await saveMessage(conversationId, "ai", finalAiMessage);

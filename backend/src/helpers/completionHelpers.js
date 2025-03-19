@@ -1,37 +1,51 @@
-import { getOpenAIInstance } from "../config/openai.js";
 import { ChatOpenAI } from "@langchain/openai";
+import { ChatMistralAI } from "@langchain/mistralai";
+import { SystemMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 import { get_encoding } from "tiktoken";
 import prompts from "../prompts/prompts.js";
+import { getOpenAIInstance } from "../config/openai.js";
+import pool from "../config/db.js";
 
 const {
   recommender_screen_multiquery_prompt,
   recommender_screen_simple_prompt,
   query_transformation_prompt,
+  rating_screen_prompt,
 } = prompts;
-import pool from "../config/db.js";
 
 function getCurrentTimestamp() {
   return Date.now();
 }
 
-// Function to transform the user's query using OpenAI
-async function transformQuery(userMessage) {
-  try {
-    const model = new ChatOpenAI({
+// Unified function to create a chat model instance based on the provider.
+function getChatModel(provider) {
+  if (provider === "openai") {
+    return new ChatOpenAI({
       model: "gpt-4o",
-      temperature: 0,
+      temperature:  0,
+      streaming: true,
     });
+  } else if (provider === "mistral") {
+    // ChatMistral should implement the same interface as ChatOpenAI.
+    return new ChatMistralAI({
+      model: "mistral-large-latest", // Adjust to your Mistral model identifier
+      temperature:  0,
+      streaming: true,
+    });
+  }
+  throw new Error(`Unknown provider: ${provider}`);
+}
 
+// Transform the user's query using the selected provider
+async function transformQuery(userMessage, provider = "openai") {
+  try {
+    const model = getChatModel(provider);
     const transformed = await model.call([
-      {
-        role: "system",
-        content: `${query_transformation_prompt} ${userMessage}`,
-      },
-      { role: "user", content: userMessage },
+      new SystemMessage(`${query_transformation_prompt} ${userMessage}`),
+      new HumanMessage(userMessage),
     ]);
-
-    // Ensure we return a string.
-    return typeof transformed === "string" ? transformed : transformed.content;
+    // Return the content of the AIMessage response.
+    return transformed.content;
   } catch (error) {
     console.error("Error during query transformation: ", error);
     return null;
@@ -73,19 +87,31 @@ async function vectorSearch(embedding, sqlQuery) {
   return retrievedArticles;
 }
 
+// Build conversation history using LangChain message classes.
 function createConversationHistory(chatLog, updatedSystemPrompt) {
-  return [
-    { role: "system", content: updatedSystemPrompt },
-    ...chatLog
-      .filter((msg) => msg.role !== "system")
-      .map((msg) => ({
-        role: msg.role === "ai" ? "assistant" : "user",
-        content: msg.text,
-      })),
-  ];
+  const history = [];
+  history.push(new SystemMessage(updatedSystemPrompt));
+  // Filter out any trailing assistant messages so the last message is from the user.
+  const filteredLog = chatLog.filter((msg, index) => {
+    // If it's the last message and its role is assistant, remove it.
+    if (index === chatLog.length - 1 && msg.role === "ai") {
+      return false;
+    }
+    return true;
+  });
+  filteredLog.forEach((msg) => {
+    if (msg.role === "user") {
+      history.push(new HumanMessage(msg.text));
+    } else if (msg.role === "ai") {
+      history.push(new AIMessage(msg.text));
+    }
+  });
+  // Optionally, if you need to prompt the model, you could append a new empty user message.
+  history.push(new HumanMessage(""));
+  return history;
 }
 
-async function doRAG(chatLog, userId, ragType, queryTransformation) {
+async function doRAG(chatLog, userId, ragType, queryTransformation, provider = "openai") {
   // SQL queries for retrieving articles and user preferences
   const articleSqlQuery = `
     SELECT id, title, summary, link, published_unix
@@ -94,7 +120,6 @@ async function doRAG(chatLog, userId, ragType, queryTransformation) {
     ORDER BY embedding <-> $1
     LIMIT 5;
   `;
-
   const userSqlQuery = `
     SELECT summary
     FROM ratings
@@ -102,28 +127,18 @@ async function doRAG(chatLog, userId, ragType, queryTransformation) {
     ORDER BY created_at DESC
     LIMIT 1;
   `;
-
-  // Get the latest user message from chat log
   const userMessage =
     chatLog.filter((msg) => msg.role === "user").pop()?.text || null;
-
   console.log("\n \n", "USER MESSAGE: ", userMessage);
 
-  // Retrieve user preferences from the database
   const userPreferences = await getUserPreferences(userSqlQuery, userId);
-
-  // Transform the query if needed
   const transformedQuery =
     queryTransformation === true && userMessage
-      ? await transformQuery(userMessage)
+      ? await transformQuery(userMessage, provider)
       : null;
-
   console.log("TRANSFORMED QUERY: ", transformedQuery);
 
-  // Determine the final query to use for embeddings
   const finalQuery = transformedQuery || userMessage;
-
-  // Generate embedding and retrieve articles based on the latest user message
   const userMessageEmbedding = finalQuery
     ? await generateEmbedding(finalQuery)
     : null;
@@ -135,33 +150,27 @@ async function doRAG(chatLog, userId, ragType, queryTransformation) {
   let context = "";
 
   if (ragType === "multiqueryRAG") {
-    // Generate embedding and retrieve articles based on user preferences
     const userPreferencesEmbedding = userPreferences
       ? await generateEmbedding(userPreferences)
       : null;
     const userPreferencesArticles = userPreferencesEmbedding
       ? await vectorSearch(userPreferencesEmbedding, articleSqlQuery)
       : "";
-
-    // Create a combined context for multiquery RAG
     context = `
     ***Articles Relevant for User Message:***
     ${userMessageArticles}
 
     ***Articles Relevant for User Preferences:***
     ${userPreferencesArticles}`;
-
     systemPrompt = `
     ${recommender_screen_multiquery_prompt}
     ${context}`;
   } else if (ragType === "simpleRAG") {
-    // Create a simpler context only based on the user query
     context = `
-    *** Todays date: ${getCurrentTimestamp()} ***
+    *** Today's date: ${getCurrentTimestamp()} ***
     ***Retrieved Articles:***
     ${userMessageArticles}
     `;
-
     systemPrompt = `
     ${recommender_screen_simple_prompt}
     ${context}
@@ -173,12 +182,8 @@ async function doRAG(chatLog, userId, ragType, queryTransformation) {
     console.error(`Unknown RAG type: ${ragType}`);
     throw new Error(`Unsupported ragType: ${ragType}`);
   }
-
-  console.log(
-    `RAG TYPE: ${ragType === "multiqueryRAG" ? "MULTIQUERY" : "SIMPLE"}`
-  );
+  console.log(`RAG TYPE: ${ragType === "multiqueryRAG" ? "MULTIQUERY" : "SIMPLE"}`);
   console.log(systemPrompt);
-
   return systemPrompt;
 }
 
@@ -191,25 +196,12 @@ function calculateTokenCount(conversation_history) {
   return tokens;
 }
 
-async function streamChatCompletion(
-  conversation_history,
-  res,
-  { onUpdate } = {}
-) {
-  // Create a ChatOpenAI instance with streaming enabled.
-  const model = new ChatOpenAI({
-    model: "gpt-4o", // adjust as needed
-    temperature: 0,
-    streaming: true,
-  });
-
+// Stream chat completion using the unified message format.
+async function streamChatCompletion(conversation_history, res, { onUpdate } = {}, provider) {
+  const model = getChatModel(provider);
   try {
-    // The stream() method accepts the conversation history (an array of messages)
-    // and returns an async iterator over response chunks.
     const stream = await model.stream(conversation_history);
-
     for await (const chunk of stream) {
-      // Each chunk is expected to have a "content" property.
       const text = chunk.content;
       if (text) {
         res.write(text);
@@ -231,7 +223,7 @@ async function saveMessage(conversationId, role, message) {
   }
   const query = `
     INSERT INTO messages (conversation_id, role, message)
-    VALUES ($1,$2,$3)
+    VALUES ($1, $2, $3)
     RETURNING id;
   `;
   const result = await pool.query(query, [conversationId, role, message]);
@@ -248,3 +240,4 @@ export {
   streamChatCompletion,
   saveMessage,
 };
+
