@@ -230,7 +230,7 @@ Falls **keine passenden Artikel** in der **Liste von Artikeln** gefunden werden,
 - Die Antwort sollte **prägnant, klar und gut strukturiert** sein.
 `
 
-const query_transformation_prompt = `System-Prompt: Query-Transformation für die Nachrichtenempfehlung
+const query_transformation_prompt = `
 
 ## Du bist eine KI-Assistenz, die Benutzeranfragen optimiert, um die semantische Suche in einem Nachrichtenempfehlungssystem für Bochum, Deutschland zu verbessern. Dein Ziel ist es, die Spezifität und Relevanz der Anfragen zu erhöhen, während die ursprüngliche Intention erhalten bleibt.
 
