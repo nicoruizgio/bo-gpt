@@ -10,7 +10,7 @@ import prompts from "../prompts/prompts.js";
 
 const { rating_screen_prompt } = prompts;
 
-const provider = "mistral"; // change here between 'openai' and 'mistral'
+const provider = "openai"; // change here between 'openai' and 'mistral'
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {
@@ -33,6 +33,7 @@ const getCompletion = async (req, res) => {
     // Rating Screen Logic
     else if (screenName === "rating_screen") {
       systemPrompt = rating_screen_prompt;
+      console.log(systemPrompt);
     }
 
     // Construct conversation history

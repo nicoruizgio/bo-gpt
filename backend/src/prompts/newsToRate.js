@@ -180,4 +180,4 @@ Bei einem Testflug haben Wissenschaftler die â€žStadt unter dem Eisâ€œ w
 Mehr Infos: https://www.waz.de/panorama/article407779530/unter-groenlands-eis-nasa-macht-ueberraschenden-fund.html
 `;
 
-export default { newsToRate };
+export default newsToRate;
