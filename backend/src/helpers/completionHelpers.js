@@ -186,6 +186,7 @@ async function doRAG(
       )
       .join("\n\n");
 
+    // Here we defined the context that will be embedded to Mistral by merging the user preferences, todays' date and the List of Articles
     context = `
     ***User Preferences***
     ${userPreferences}
@@ -195,6 +196,8 @@ async function doRAG(
     ***List of Articles:***
     ${formattedArticles}
     `;
+
+    //Then we merged the Mistral system prompt and the context to define a final system prompt
     systemPrompt = `
     ${recommender_screen_mistral_prompt}
     ${context}
