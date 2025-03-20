@@ -10,7 +10,7 @@ import prompts from "../prompts/prompts.js";
 
 const { rating_screen_prompt } = prompts;
 
-const provider = "openai"; // change here between 'openai' and 'mistral'
+const provider = "mistral"; // change here between 'openai' and 'mistral'
 
 /* Chat completion for rating and recommender screen */
 const getCompletion = async (req, res) => {

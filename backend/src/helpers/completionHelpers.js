@@ -34,6 +34,7 @@ function getChatModel(provider) {
     return new ChatMistralAI({
       model: "mistral-large-latest", // Change here mistral model
       temperature: 0,
+      maxTokens: 5000,
       streaming: true,
     });
   }
