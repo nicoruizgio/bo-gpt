@@ -8,13 +8,14 @@ This project is divided into two main folders: `backend` and `frontend`. Below, 
 
 1. [Running the Backend](#running-the-backend)
 2. [Running the Fronted](#running-the-frontend)
-3. [Switching Between OpenAI Models](#switching-between-openai-models)
-4. [Modifying Prompts](#modifying-prompts)
-5. [MultiqueryRAG vs SimpleRAG](#multiqueryrag-vs-simplerag)
-6. [Toggling Between RAG Pipelines](#toggling-between-rag-pipelines)
-7. [Using Query Transformations](#using-query-transformations)
-8. [Viewing Logs](#viewing-logs)
-9. [Running the Frontend](#running-the-frontend)
+3. [Switching Between Models](#switching-between-models)
+4. [Switching between OpenAI and Mistral](#switching-between-openai-and-mistral)
+5. [Modifying Prompts](#modifying-prompts)
+6. [MultiqueryRAG vs SimpleRAG](#multiqueryrag-vs-simplerag)
+7. [Toggling Between RAG Pipelines](#toggling-between-rag-pipelines)
+8. [Using Query Transformations](#using-query-transformations)
+9. [Viewing Logs](#viewing-logs)
+10. [Running the Frontend](#running-the-frontend)
 
 ---
 
@@ -61,7 +62,7 @@ This should start the frontend development server. Follow the console output to 
 
 ---
 
-## Switching Between OpenAI Models
+## Switching Between Models
 
 To modify the OpenAI models used in different parts of the system, update the relevant files as follows:
 
@@ -71,17 +72,67 @@ To modify the OpenAI models used in different parts of the system, update the re
   model: "gpt-4o"
   ```
 
-- **Rating and Recommender Chatbot Model**
-  Go to `backend/src/helpers/completionHelpers` and update the `model` field inside the `async function streamChatCompletion`:
+- **Query Transformation Model + Rating and Recommender Chatbot Model**
+  Go to `backend/src/helpers/completionHelpers` and update the `model` field inside the `getChatModel` function:
   ```js
   model: "gpt-4o"
   ```
 
-- **Query Transformation Model**
-  In `backend/src/helpers/completionHelpers`, modify the `model` field inside `async function transformQuery`:
+  You can also change the Mistral model in the same `getChatModel` function:
+
   ```js
-  model: "gpt-4o"
+  return new ChatMistralAI({
+      model: "mistral-large-latest", // Change mistral model here
+      temperature: 0,
+      streaming: true,
+    });
   ```
+
+
+---
+
+## Switching Between OpenAI and Mistral
+
+When using **Mistral** in Bo-GPT, we follow the **"all news articles in the context window" approach**—this means that instead of using RAG, all articles from the last *n* days are appended directly to the context window.
+
+### Enabling Mistral
+To enable Mistral, navigate to `backend/src/controllers/completionController.js` and set:
+
+```js
+const provider = "mistral";
+```
+
+To switch back to OpenAI models, update the provider as follows:
+
+```js
+const provider = "openai";
+```
+
+### Verifying the Active Provider
+You can check which provider is currently in use by looking at the terminal output when interacting with the recommender chatbot. The terminal will display:
+
+```bash
+PROVIDER: MISTRAL
+```
+
+### Modifying Mistral's System Prompt
+To adjust the system prompt for Mistral, go to `backend/src/prompts/prompts.js` and modify the variable:
+
+```js
+recommender_screen_mistral_prompt
+```
+
+### Adjusting the Article Retrieval Window
+To change the number of days from which articles are retrieved, navigate to `backend/src/helpers/completionHelpers.js`. Inside the `doRAG` function, modify the following line:
+
+```js
+const articles = await getRecentArticles(1);
+```
+
+Replace `1` with the desired number of days.
+
+---
+
 
 ## Modifying Prompts
 
@@ -96,9 +147,37 @@ All chatbot prompts are defined in `prompts.js`, including:
 - `get_user_preferences_prompt`: Used to generate the user preference summary based on the conversation with the rating bot.
 - `recommender_screen_multiquery_prompt`: Used by the recommender chatbot that employs a multi-query RAG pipeline.
 - `recommender_screen_simple_prompt`: Used by the recommender chatbot that employs a simple RAG pipeline.
+-  `recommender_screen_mistral_prompt`: Used by the recommender chatbot when mistral is enabled.
 - `query_transformation_prompt`: Used to enhance user message
 
 Feel free to adjust these prompts to experiment with different chatbot behaviors.
+
+### Hint:
+
+The system prompts define the overall behavior of the chatbots and specify how to handle retrieved articles when using RAG pipelines or appending them to the context window when using Mistral. Additionally, they incorporate user preferences.
+
+Every time the model is prompted to generate a response, the relevant articles and user preferences are dynamically retrieved and embedded into the model’s context. You can review how this process is implemented in the `doRAG` function located in `backend/src/helpers/completionHelpers.js`.
+
+```js
+// The context embedded into Mistral is created by combining user preferences, the current date, and the retrieved list of articles.
+context = `
+***User Preferences***
+${userPreferences}
+
+***Today's Date: ${getCurrentTimestamp()}***
+
+***List of Articles***
+${formattedArticles}
+`;
+
+// The final system prompt is then generated by merging the Mistral system prompt with the constructed context.
+systemPrompt = `
+${recommender_screen_mistral_prompt}
+${context}
+`;
+```
+
+A similar process is followed for both the simple and multi-query RAG pipelines.
 
 ---
 
