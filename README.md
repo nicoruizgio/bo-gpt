@@ -15,7 +15,6 @@ This project is divided into two main folders: `backend` and `frontend`. Below, 
 7. [Toggling Between RAG Pipelines](#toggling-between-rag-pipelines)
 8. [Using Query Transformations](#using-query-transformations)
 9. [Viewing Logs](#viewing-logs)
-10. [Running the Frontend](#running-the-frontend)
 
 ---
 
