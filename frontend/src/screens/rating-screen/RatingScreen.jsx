@@ -6,16 +6,25 @@ import { storeRatingSummary } from "../../api/storeRatingsApi";
 import { usePersistedState } from "../../hooks/usePersistedState";
 
 const RatingScreen = () => {
-  const [chatLog, setChatLog] = useState([{id: 'ai-stream', role: "ai", text: "Hallo, ich bin Bo-GPT und werde Ihnen 36 Nachrichtenartikel präsentieren, die Sie von 1 bis 5 bewerten können. Bist du bereit?"}]);
+  const [chatLog, setChatLog] = useState([
+    {
+      id: "ai-stream",
+      role: "ai",
+      text: "Hey, ich bin Bo-GPT und werde dir 36 Nachrichtenartikel zeigen. Deine Aufgabe: Bewerte jede Nachricht auf einer Skala von 1 (= daran bin ich überhaupt nicht interessiert) bis 5 (= daran bin ich äußerst interessiert). Schreib mir dazu einfach die Zahl, die für dich am besten passt. Bist du bereit?",
+    },
+  ]);
   const [loading, setLoading] = useState(false);
-  const [conversationId, setConversationId] = usePersistedState("ratingConversationId", null)
+  const [conversationId, setConversationId] = usePersistedState(
+    "ratingConversationId",
+    null
+  );
   const navigate = useNavigate();
 
   // Reset conversation Id every time the screen mounts
   useEffect(() => {
     localStorage.removeItem("conversationId");
     setConversationId(null);
-  }, [])
+  }, []);
 
   const handleNext = async () => {
     localStorage.removeItem("conversationId");

@@ -14,10 +14,12 @@ const Introduction = () => {
       <HeaderComponent isLoggedIn={true} />
 
       <div className="screen-container introduction">
-        <h2>Willkommen bei BO-GPT</h2>
+        <h2>Bewerte Nachrichten aus Bochum</h2>
         <p className="introduction-text">
-        Auf der folgenden Seite werden Sie mit einem KI-Chatbot interagieren, der Ihnen 16 Nachrichtenartikel präsentiert.
-        Bewerten Sie diese je nach Ihren Vorlieben von 1 bis 5. Drücken Sie auf Start, um zu beginnen.
+          Stell dir vor, du möchtest dich über die aktuellen Nachrichten aus
+          deiner Stadt informieren. Im Chat werden dir verschiedene Nachrichten
+          gezeigt. Deine Aufgabe ist es, jede Nachricht danach zu bewerten, wie
+          sehr sie dich interessiert oder nicht.
         </p>
         <button className="button" onClick={handleStart}>
           Start
