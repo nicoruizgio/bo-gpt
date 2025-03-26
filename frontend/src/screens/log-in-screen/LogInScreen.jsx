@@ -70,12 +70,19 @@ const LogInScreen = () => {
               required
             />
           </label>
+
           <button className="button login" type="submit" disabled={loading}>
             {loading ? <Spinner /> : "Anmelden"}
           </button>
         </form>
         <p className="create-new-account" onClick={() => navigate("/sign-up")}>
           Neues Konto erstellen
+        </p>
+        <p
+          className="forgot-password"
+          onClick={() => navigate("/reset-password")}
+        >
+          Ich habe mein Passwort vergessen
         </p>
       </div>
     </>

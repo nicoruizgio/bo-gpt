@@ -100,4 +100,36 @@ const logoutUser = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
-export default { registerUser, loginUser, logoutUser };
+// Reset password
+const resetPassword = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if the user exists
+    const userCheck = await pool.query(
+      "SELECT * FROM participants WHERE username = $1",
+      [username]
+    );
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Hash the new password
+    const hashedPassword = await hash(password, 10);
+
+    // Update the user's password in the database
+    await pool.query(
+      "UPDATE participants SET password = $1 WHERE username = $2",
+      [hashedPassword, username]
+    );
+
+    // Respond with success message
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+export default { registerUser, loginUser, logoutUser, resetPassword };

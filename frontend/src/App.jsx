@@ -9,6 +9,7 @@ import Introduction from "./screens/introduction-screen/Introduction-screen";
 import RecommenderScreen from "./screens/recommender-screen/RecommenderScreen";
 import LogInScreen from "./screens/log-in-screen/LogInScreen";
 import SignUpScreen from "./screens/sign-up-screen/SingUpScreen";
+import ResetPasswordScreen from "./screens/reset-password/ResetPasswordScreen";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import Instruction from "./screens/instruction-screen/InstructionScreen";
@@ -24,6 +25,7 @@ function App() {
         <Route element={<PublicRoute />}>
           <Route path="/log-in" element={<LogInScreen />} />
           <Route path="/sign-up" element={<SignUpScreen />} />
+          <Route path="reset-password" element={<ResetPasswordScreen/>} />
         </Route>
 
         {/* Protected Routes */}

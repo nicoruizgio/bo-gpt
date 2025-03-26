@@ -116,7 +116,7 @@ const SignUpScreen = () => {
       {modal && (
         <div className="modal">
           <div className="modal-content">
-            <p className="modal-title">Account created successfully!</p>
+            <p className="modal-title">Konto erfolgreich erstellt!</p>
             <span className="material-symbols-outlined">task_alt</span>
           </div>
         </div>
