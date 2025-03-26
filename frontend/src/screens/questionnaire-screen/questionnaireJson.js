@@ -23,6 +23,8 @@ const questionnaireJson = {
           text: "Bitte geben Sie eine gültige Zahl ein.",
         },
       ],
+      isRequired: true,
+      requiredErrorText: "Bitte beantworten Sie diese Frage.",
     },
     {
       type: "radiogroup",
