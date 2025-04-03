@@ -18,6 +18,10 @@
   transform: translateX(-50%); /* Perfectly center */
   text-align: center;
 }
+
+.header-title h2{
+  cursor: pointer;
+}
 .user-info {
   font-weight: 600;
   display: flex;

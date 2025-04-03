@@ -49,7 +49,7 @@ const HeaderComponent = ({ isLoggedIn, screenName, setChatLog, setConversationId
       )}
 
       <div className="header-title">
-        <h2>Bo-GPT</h2>
+        <h2 onClick={() => !isLoggedIn && navigate("/log-in")}>Bo-GPT</h2>
         {screenName === "rating_screen" ? (
           <h3 className="sub-title">Rating</h3>
         ) : screenName === "recommender_screen" ? (

@@ -57,3 +57,42 @@ CREATE TABLE rss_embeddings (
     published_unix BIGINT,
     embedding VECTOR(1536)
 );
+
+
+--- questionnaire view
+CREATE VIEW participant_profiles AS
+SELECT
+  p.id AS participant_id,
+  p.username,
+  q.age,
+  q.gender,
+  q.location,
+  q.education,
+  q.news_consumption_frequency,
+  COUNT(DISTINCT c.id) AS num_conversations,
+  COUNT(m.id) AS num_messages
+FROM participants p
+LEFT JOIN questionnaire_responses q ON p.id = q.participant_id
+LEFT JOIN conversations c ON p.id = c.participant_id
+LEFT JOIN messages m ON c.id = m.conversation_id
+GROUP BY p.id, q.age, q.gender, q.location, q.education, q.news_consumption_frequency;
+
+
+--- conversation view
+CREATE VIEW conversation_history AS
+SELECT
+  c.id AS conversation_id,
+  p.username,
+  c.conversation_type,
+  m.role,
+  m.message,
+  m.sent_at
+FROM conversations c
+JOIN participants p ON c.participant_id = p.id
+JOIN messages m ON m.conversation_id = c.id
+ORDER BY c.id, m.sent_at;
+
+
+--- delete all conversations and restore id
+TRUNCATE conversations RESTART IDENTITY CASCADE;
+
